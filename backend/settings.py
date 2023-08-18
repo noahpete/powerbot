@@ -138,7 +138,16 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000'
+    'http://localhost:3000',
+    'http://127.0.0.1:3000'
+    'http://powerbot-1f0600cd4beb.herokuapp.com',
+    'http://powerbot-herokuapp.com',
+    'https://powerbot-1f0600cd4beb.herokuapp.com',
+    'https://powerbot-herokuapp.com',
+    'http://powerbot-1f0600cd4beb.herokuapp.com:3000',
+    'http://powerbot-herokuapp.com:3000',
+    'https://powerbot-1f0600cd4beb.herokuapp.com:3000',
+    'https://powerbot-herokuapp.com:3000',
 ]
 
 django_heroku.settings(locals())
