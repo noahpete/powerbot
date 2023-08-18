@@ -27,4 +27,5 @@ router.register(r'bot', views.BotView, 'bot')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
+    path('', views.index)
 ]

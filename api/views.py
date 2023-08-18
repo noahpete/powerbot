@@ -1,11 +1,11 @@
 import os
 import shutil
 import time
-import uuid
 import glob
 from pathlib import Path
 import django
 from django.http import FileResponse, HttpResponse, JsonResponse
+from django.shortcuts import render
 from rest_framework import viewsets, renderers
 from rest_framework.decorators import action
 from rest_framework import viewsets, status
@@ -17,6 +17,9 @@ from .models import Song, Songs
 from .config import SP_DC
 from .bot import PowerBot
 
+
+def index(request):
+    return render(request, 'public/index.html')
 
 class PassthroughRenderer(renderers.BaseRenderer):
     """
