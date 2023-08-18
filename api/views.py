@@ -19,7 +19,7 @@ from .bot import PowerBot
 
 
 def index(request):
-    return render(request, 'staticfiles/index.html')
+    return render(request, 'index.html')
 
 class PassthroughRenderer(renderers.BaseRenderer):
     """
