@@ -138,7 +138,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
-    'http://127.0.0.1:3000'
+    'http://127.0.0.1:3000',
     'http://powerbot-1f0600cd4beb.herokuapp.com',
     'http://powerbot-herokuapp.com',
     'https://powerbot-1f0600cd4beb.herokuapp.com',
