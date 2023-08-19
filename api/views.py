@@ -96,6 +96,7 @@ class BotView(viewsets.ModelViewSet):
         """
         Handle POST requests to /api/bot/generate/.
         """
+        print('GENERATE DIR: ', os.getcwd())
         # cleanup from last generation
         if request.session.items():
             prev_dir = Path(f'./api/{request.session["id"]}temp')

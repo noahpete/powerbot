@@ -83,7 +83,10 @@ const Main = () => {
         setIsGenerating(false);
         setDownloadReady(true);
       })
-      .catch((err) => console.log(err));
+      .catch((err) => {
+        setIsGenerating(false);
+        console.log(err);
+      });
   };
 
   const handleDownload = () => {
