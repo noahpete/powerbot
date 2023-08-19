@@ -38,9 +38,7 @@ const Searchbar = ({ addFunction }) => {
       return;
     }
     try {
-      const response = await fetch(
-        `http://powerbot-1f0600cd4beb.herokuapp.com/api/songs/search/${searchTerm}/`
-      );
+      const response = await fetch(`/api/songs/search/${searchTerm}/`);
       // console.log(response);
       const data = await response.json();
       return data;
