@@ -26,14 +26,13 @@ SP_DC = 'AQBBl8RuaJ8Oab7AQynbfp084WVtSFXHRnM6IndflkNY1-541hgl6edRb2gI5Nvk6kgfoCe
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['powerbot.herokuapp.com', '127.0.0.1:8000', 'localhost']
+ALLOWED_HOSTS = ['powerbot.herokuapp.com', 'powerbot-1f0600cd4beb.herokuapp.com', '127.0.0.1:8000', 'localhost']
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'build/static'),
-    os.path.join(BASE_DIR, 'public')
 ]
    
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
