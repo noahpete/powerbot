@@ -75,7 +75,7 @@ const Main = () => {
     setIsGenerating(true);
     setDownloadReady(false);
     axios
-      .post("http://localhost:8000/api/bot/generate/", {
+      .post("/api/bot/generate/", {
         songs: songs,
         sessionId: newId,
       })
@@ -89,7 +89,7 @@ const Main = () => {
   const handleDownload = () => {
     const config = {
       method: "GET",
-      url: "http://localhost:8000/api/bot/download/",
+      url: "/api/bot/download/",
       responseType: "blob",
       maxContentLength: Infinity,
       maxBodyLength: Infinity,
@@ -122,7 +122,7 @@ const Main = () => {
   };
 
   const handleClear = () => {
-    axios.post("http://localhost:8000/api/bot/clear/", sessionId);
+    axios.post("/api/bot/clear/", sessionId);
   };
 
   const setupBeforeUnloadListener = () => {
