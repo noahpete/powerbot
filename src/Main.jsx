@@ -20,7 +20,7 @@ const theme = createTheme({
       contrastText: "#fff",
     },
     red: {
-      main: "#EA0101",
+      main: "#C01B22",
       contrastText: "#fff",
     },
     yellow: {
