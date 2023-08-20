@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-$os=5yt==dh%4t8j&=g_=@h(zx3@0j_+938p3us49(h#lrgy$'
 SP_DC = 'QBBl8RuaJ8Oab7AQynbfp084WVtSFXHRnM6IndflkNY1-541hgl6edRb2gI5Nvk6kgfoCeG02qTiiCn0vroCnatcckUMGTwbT5sLzkpDcBYXjn1sn0mgcwb6hzeYIzsO5xR97hsNv9M3xfR1VnF1Q1sYiim2Rgo'
 
-DEBUG = FALSE
+DEBUG = False
 
 ALLOWED_HOSTS = ['powerbot.herokuapp.com',
                  'powerbot-1f0600cd4beb.herokuapp.com', '127.0.0.1:8000', 'localhost']
