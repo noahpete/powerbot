@@ -1,4 +1,5 @@
 """API configuration file."""
+import boto3
 
 
 # keys
@@ -47,3 +48,9 @@ SECTIONS_BY_PREFERENCE = [
     'pre-chorus',
     'chorus',
 ]
+
+# S3 settings
+S3_SESSION = boto3.Session(
+    aws_access_key_id='',
+    aws_secret_access_key=''
+)

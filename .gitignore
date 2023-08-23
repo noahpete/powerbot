@@ -3,6 +3,7 @@ env
 *.mp4
 *.mp3
 *temp
+*.pem
 
 # dependencies
 /node_modules

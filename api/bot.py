@@ -2,6 +2,7 @@
 Powerbot playlist generator.
 """
 import os
+import boto3
 from syrics.api import Spotify
 from lyricsgenius import Genius
 from .config import *
@@ -11,18 +12,6 @@ from .song import Song
 
 
 class PowerBot():
-    CHORUS_LENGTH_SEC = 60
-    CHORUS_OFFSET_MS = -12000
-    VIDEO_PHRASES_DESIRED = [
-        '(Official Video)'
-    ]
-    VIDEO_PREFIXES_TO_AVOID = [
-        ' -', ' (feat', '(with', '(Parody'
-    ]
-    VIDEO_PHRASES_TO_AVOID = [
-        '(Clean',
-    ]
-    VIEW_THRESHOLD = 50000000
 
     def __init__(self, song_jsons: list, uuid: str, max_attempts=10, token=""):
         """
@@ -44,18 +33,9 @@ class PowerBot():
                 song = Song(i, json, uuid)
                 if song:
                     self.songs.append(song)
-            #     with concurrent.futures.ThreadPoolExecutor() as executor:
-            #         future = executor.submit(Song, i, json, uuid)
-            #         # Set timeout to 20 seconds
-            #         song = future.result(timeout=20)
-            #         if song:
-            #             self.songs.append(song)
-            # except concurrent.futures.TimeoutError:
-            #     print(
-            #         f'Skipped initializing song with title {json["name"]} due to timeout.')
             except Exception as e:
                 print(
-                    f'Could not add song with title {json["name"]}. Error: {e}')
+                    f'Could not add song with title {json["name"]}. Error: {e.with_traceback}')
 
     def generate(self):
         for song in self.songs:
@@ -70,6 +50,7 @@ class PowerBot():
                 'chorus_time': song.chorus_time_ms
             })
 
+        # TODO: retrieve from S3
         paths = []
         for i in range(len(self.songs)):
             paths.append(f'./api/{self.id}temp/{self.id}{i}v.mp4')

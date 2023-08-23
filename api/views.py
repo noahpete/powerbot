@@ -3,14 +3,19 @@ import shutil
 import time
 import glob
 from pathlib import Path
+
 import django
 from django.http import FileResponse, HttpResponse, JsonResponse
 from django.shortcuts import render
-from rest_framework import viewsets, renderers
-from rest_framework.decorators import action
-from rest_framework import viewsets, status
+
+from rest_framework import (
+    viewsets,
+    renderers,
+    status,
+)
 from rest_framework.decorators import action
 from rest_framework.response import Response
+
 from syrics.api import Spotify
 from .serializers import SongSerializer, BotSerializer
 from .models import Song, Songs
@@ -20,6 +25,7 @@ from .bot import PowerBot
 
 def index(request):
     return render(request, 'index.html')
+
 
 class PassthroughRenderer(renderers.BaseRenderer):
     """
@@ -96,7 +102,7 @@ class BotView(viewsets.ModelViewSet):
         """
         Handle POST requests to /api/bot/generate/.
         """
-        print('GENERATE DIR: ', os.getcwd())
+        # print('GENERATE DIR: ', os.getcwd())
         # cleanup from last generation
         if request.session.items():
             prev_dir = Path(f'./api/{request.session["id"]}temp')
@@ -138,7 +144,7 @@ class BotView(viewsets.ModelViewSet):
         for current user.
         """
         if not request.data:
-            return HttpResponse(status=404)
+            return HttpResponse(status=201)
 
         session_id = next(iter(request.data.dict().keys()))
         for filename in glob.glob(f'./{session_id}*', recursive=True):

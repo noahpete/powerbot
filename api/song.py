@@ -1,10 +1,10 @@
 """
 A Song class containing information for each song in the playlist.
 """
-import json
 import os
 import re
 import requests
+import boto3
 from pathlib import Path
 from time import sleep
 from pytube import YouTube, Channel
@@ -13,8 +13,36 @@ from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
 from lyricsgenius import Genius
 from syrics.api import Spotify
 from .lyrics import Lyrics
-from pprint import pprint
 from .config import *
+
+
+def upload_video(file_name, file_path):
+    """
+    Upload a video to S3.
+    """
+    try:
+        # s3_bucket = os.environ.get('S3_BUCKET')
+        s3_bucket = 'powerbot-working-directory'
+        s3 = boto3.client('s3')
+        print('\n\n', s3_bucket, s3, '\n\n')
+        presigned_post = s3.generate_presigned_post(
+            Bucket=s3_bucket,
+            Key=file_name,
+            Fields={"acl": "public-read", "Content-Type": 'video/mp4'},
+            Conditions=[
+                {"acl": "public-read"},
+                {"Content-Type": 'video/mp4'}
+            ],
+            ExpiresIn=3600
+        )
+        print('PRESIGNED: ', presigned_post)
+        response = requests.post(
+            url=f'https://{s3_bucket}.s3.amazonaws.com/{file_name}',
+            data=presigned_post
+        )
+        print(response.text)
+    except Exception as e:
+        print(f'Error while uploading file {file_name}. Error: {e}')
 
 
 class Song():
@@ -126,6 +154,8 @@ class Song():
         video = YouTube(f'https://www.youtube.com/watch?v={yt_video_id}')
         channel = Channel(video.channel_url)
         num_subs = self.get_subscriber_count(channel)
+
+        # TODO: add length check to not overwhelm heroku server
 
         for phrase in YT_PHRASES_BLACKLIST:
             if phrase in video.title:
@@ -352,11 +382,15 @@ class Song():
         clip_end_ms = min(self.duration_ms, clip_end_ms)
 
         if os.path.exists(f'./api/{self.id}temp/'):
+            file_name = f'{self.id}{self.index}'
+            file_path = f'./api/{self.id}temp/{file_name}.mp4'
             ffmpeg_extract_subclip(
-                f'./api/{self.id}temp/{self.id}{self.index}.mp4',
+                file_path,
                 clip_start_ms / 1000,
                 clip_end_ms / 1000,
                 targetname=f'./api/{self.id}temp/{self.id}{self.index}v.mp4')
+
+            upload_video(file_name, file_path)
 
             print(f'Successful cut for {self.title}.')
 

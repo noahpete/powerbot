@@ -64,7 +64,7 @@ const Main = () => {
   };
 
   const handleGenerate = () => {
-    if (songs.length < 1) {
+    if (songs.length < 1 || isGenerating) {
       return;
     }
     if (sessionId) {
@@ -90,6 +90,9 @@ const Main = () => {
   };
 
   const handleDownload = () => {
+    if (isGenerating) {
+      return;
+    }
     const config = {
       method: "GET",
       url: "/api/bot/download/",

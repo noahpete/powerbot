@@ -1,0 +1,16 @@
+{
+  "files": {
+    "main.css": "./static/css/main.3c951fc7.css",
+    "main.js": "./static/js/main.549d2e96.js",
+    "static/js/787.cda612ba.chunk.js": "./static/js/787.cda612ba.chunk.js",
+    "static/media/powerbotlogo.png": "./static/media/powerbotlogo.13909adefb1c80c36f15.png",
+    "index.html": "./index.html",
+    "main.3c951fc7.css.map": "./static/css/main.3c951fc7.css.map",
+    "main.549d2e96.js.map": "./static/js/main.549d2e96.js.map",
+    "787.cda612ba.chunk.js.map": "./static/js/787.cda612ba.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.3c951fc7.css",
+    "static/js/main.549d2e96.js"
+  ]
+}
