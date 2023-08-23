@@ -1,9 +1,11 @@
 env
-# .env
+.env
 *.mp4
 *.mp3
 *temp
 *.pem
+staticfiles
+build
 
 # dependencies
 /node_modules
