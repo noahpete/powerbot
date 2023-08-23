@@ -76,7 +76,7 @@ const Searchbar = ({ addFunction }) => {
 
   return (
     <form onSubmit={(event) => handleSubmit(event)} autoComplete="off">
-      <div className="bg-white flex shadow-sm p-1 outline outline-1 outline-gray-200 w-[400px] h-8">
+      <div className="bg-white flex shadow-sm p-1 outline outline-1 outline-gray-200 w-full h-8">
         <SearchIcon className="text-gray-400 ml-2" />
         <input
           ref={inputRef} // Add a reference to the input element
@@ -92,8 +92,8 @@ const Searchbar = ({ addFunction }) => {
         />
       </div>
       <div
-        className={`mt-2 w-[400px] outline outline-1 outline-gray-200 transition-height duration-500 ease-in-out h-8 ${
-          isExpanded ? "h-[520px]" : "h-0"
+        className={`mt-2 p-2 full outline outline-1 outline-gray-200 transition-height duration-500 ease-in-out h-8 ${
+          isExpanded ? "h-fit" : "h-0"
         }`}
       >
         {list?.tracks.items.map((item, i) => (

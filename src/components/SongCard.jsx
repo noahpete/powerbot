@@ -17,19 +17,19 @@ const SongCard = ({ song, small = false, addFunction, removeFunction }) => {
   return (
     <div
       draggable="true"
-      className="flex w-[400px] p-0.5 transition ease-in hover:bg-gray-100"
+      className="flex w-full p-0.5 transition ease-in hover:bg-gray-100"
     >
-      <div className={`relative w-fit h-${small ? "12" : "20"}`}>
+      <div className={` w-${small ? "12" : "20"} h-${small ? "12" : "20"}`}>
         <img
           alt="song album cover"
           src={song?.album.images[1]?.url}
-          className="h-full"
+          className="h-full w-full"
         />
       </div>
       <div
         className={`flex flex-col justify-center ${
           small ? "h-12" : "h-20"
-        } w-1/2 ml-4`}
+        } w-[140px] ml-4`}
       >
         <h1
           className={`font-bold ${
@@ -58,7 +58,7 @@ const SongCard = ({ song, small = false, addFunction, removeFunction }) => {
           </IconButton>
         </div>
       ) : (
-        <div className="aspect-square ml-[40px] mt-[18px]">
+        <div className="aspect-square ml-[45px] mt-[18px]">
           <IconButton onClick={handleRemoveSong}>
             <RemoveIcon className="text-gray-400"></RemoveIcon>
           </IconButton>
