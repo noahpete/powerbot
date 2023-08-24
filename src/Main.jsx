@@ -83,11 +83,11 @@ const Main = () => {
         } seconds.`
       );
       setTimeout(() => {
-        if (isTelevising) {
-          console.log(index, song);
-          setCurYtId(song.yt_id);
-          setCurStartTimeMs(song.chorus_time_ms[0]);
-        }
+        // if (isTelevising) {
+        console.log(index, song);
+        setCurYtId(song.yt_id);
+        setCurStartTimeMs(song.chorus_time_ms[0]);
+        // }
       }, curDelayMs);
       curDelayMs += chorus_length_ms;
     });
@@ -246,7 +246,7 @@ const Main = () => {
           <div className="w-full ml-auto mr-auto max-w-sm p-2 mt-2">
             <div id="tv-container" className="w-full h-[210px]">
               <ReactPlayer
-                url={`https://www.youtube.com/watch?v=${curYtId}&t=${
+                url={`https://www.nsfwyoutube.com/watch?v=${curYtId}&t=${
                   curStartTimeMs / 1000
                 }`}
                 width={370}
