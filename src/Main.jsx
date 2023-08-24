@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import SongCard from "./components/SongCard";
 import Searchbar from "./components/Searchbar";
+import Tv from "./components/Tv";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Button, LinearProgress } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
@@ -144,118 +145,6 @@ const Main = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      {/* <div className="bg-white flex relative w-100vh">
-        <div className="flex">
-          <div className="w-[400px] mr-4 mt-10 p-4 top-10"></div>
-          <div className="w-[400px] h-0 mr-4 p-4 justify-center fixed top-10">
-            <img className="ml-4 mb-4" src={Logo} alt="" />
-
-            <Searchbar
-              songIds={songIds}
-              setSongIds={setSongIds}
-              addFunction={addSong}
-            />
-
-            <div className="w-[400px] mt-3 flex justify-center">
-              <Button
-                className="m-1"
-                color="secondary"
-                variant={
-                  !isGenerating && songs.length > 1 ? "outlined" : "outlined"
-                }
-                onClick={handleShuffle}
-              >
-                Shuffle
-              </Button>
-              <Button
-                className="m-1"
-                onClick={handleGenerate}
-                color="red"
-                variant={
-                  isGenerating || songs.length === 0 ? "contained" : "contained"
-                }
-              >
-                Generate
-              </Button>
-              <Button
-                className="m-1"
-                onClick={handleDownload}
-                color="blue"
-                variant={downloadReady ? "contained" : "disabled"}
-              >
-                Download
-              </Button>
-            </div>
-
-            <div className="">
-              {isGenerating ? (
-                <>
-                  <LinearProgress
-                    color="blue"
-                    className="h-[4px] w-[300px] ml-[12.5%]"
-                  />
-                </>
-              ) : (
-                ""
-              )}
-            </div>
-          </div>
-
-          <div className="flex p-4 right-10 justify-center h-0 mt-10">
-            <div className="w-[410px] h-fit shadow-sm flex flex-col gap-0 outline outline-1 outline-gray-200 p-1.5">
-              {songs.length === 0 ? (
-                <p className="ml-2 text-gray-400 text-center">
-                  Got some work to do...
-                </p>
-              ) : (
-                ""
-              )}
-              <DragDropContext
-                onDragEnd={(res) => {
-                  if (!res.destination) return;
-                  const items = Array.from(songs);
-                  const [reorderedItem] = items.splice(res.source.index, 1);
-                  items.splice(res.destination.index, 0, reorderedItem);
-                  setSongs(items);
-                }}
-              >
-                <Droppable droppableId="songs">
-                  {(provided) => (
-                    <ul
-                      className="songs divide-y divide-gray-200"
-                      {...provided.droppableProps}
-                      ref={provided.innerRef}
-                    >
-                      {songs.map((song, i) => (
-                        <Draggable
-                          key={`${song.id}${i}`}
-                          draggableId={`${song.id}${i}`}
-                          index={i}
-                        >
-                          {(provided) => (
-                            <li
-                              {...provided.draggableProps}
-                              {...provided.dragHandleProps}
-                              ref={provided.innerRef}
-                            >
-                              <SongCard
-                                song={song}
-                                i={i}
-                                removeFunction={removeSong}
-                              />
-                            </li>
-                          )}
-                        </Draggable>
-                      ))}
-                      {provided.placeholder}
-                    </ul>
-                  )}
-                </Droppable>
-              </DragDropContext>
-            </div>
-          </div>
-        </div>
-      </div> */}
       <div className="w-full h-full p-4">
         <div id="container" className="md:flex max-w-[854px] w-full m-auto">
           <div id="control" className="max-w-sm m-auto">
@@ -314,59 +203,62 @@ const Main = () => {
             </div>
           </div>
 
-          <div
-            id="songcards"
-            className="w-full ml-auto mr-auto max-w-sm p-2 mt-2 h-fit shadow-sm flex flex-col gap-0 outline outline-1 outline-gray-200"
-          >
-            {songs.length === 0 ? (
-              <p className="ml-2 text-gray-400 text-center">
-                Got some work to do...
-              </p>
-            ) : (
-              ""
-            )}
-            <DragDropContext
-              onDragEnd={(res) => {
-                if (!res.destination) return;
-                const items = Array.from(songs);
-                const [reorderedItem] = items.splice(res.source.index, 1);
-                items.splice(res.destination.index, 0, reorderedItem);
-                setSongs(items);
-              }}
+          <div className="w-full ml-auto mr-auto max-w-sm p-2 mt-2">
+            <Tv />
+            <div
+              id="songcards"
+              className="w-full ml-auto mr-auto max-w-sm p-2 mt-2 h-fit shadow-sm flex flex-col gap-0 outline outline-1 outline-gray-200"
             >
-              <Droppable droppableId="songs">
-                {(provided) => (
-                  <ul
-                    className="songs divide-y divide-gray-200"
-                    {...provided.droppableProps}
-                    ref={provided.innerRef}
-                  >
-                    {songs.map((song, i) => (
-                      <Draggable
-                        key={`${song.id}${i}`}
-                        draggableId={`${song.id}${i}`}
-                        index={i}
-                      >
-                        {(provided) => (
-                          <li
-                            {...provided.draggableProps}
-                            {...provided.dragHandleProps}
-                            ref={provided.innerRef}
-                          >
-                            <SongCard
-                              song={song}
-                              i={i}
-                              removeFunction={removeSong}
-                            />
-                          </li>
-                        )}
-                      </Draggable>
-                    ))}
-                    {provided.placeholder}
-                  </ul>
-                )}
-              </Droppable>
-            </DragDropContext>
+              {songs.length === 0 ? (
+                <p className="ml-2 text-gray-400 text-center">
+                  Got some work to do...
+                </p>
+              ) : (
+                ""
+              )}
+              <DragDropContext
+                onDragEnd={(res) => {
+                  if (!res.destination) return;
+                  const items = Array.from(songs);
+                  const [reorderedItem] = items.splice(res.source.index, 1);
+                  items.splice(res.destination.index, 0, reorderedItem);
+                  setSongs(items);
+                }}
+              >
+                <Droppable droppableId="songs">
+                  {(provided) => (
+                    <ul
+                      className="songs divide-y divide-gray-200"
+                      {...provided.droppableProps}
+                      ref={provided.innerRef}
+                    >
+                      {songs.map((song, i) => (
+                        <Draggable
+                          key={`${song.id}${i}`}
+                          draggableId={`${song.id}${i}`}
+                          index={i}
+                        >
+                          {(provided) => (
+                            <li
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                              ref={provided.innerRef}
+                            >
+                              <SongCard
+                                song={song}
+                                i={i}
+                                removeFunction={removeSong}
+                              />
+                            </li>
+                          )}
+                        </Draggable>
+                      ))}
+                      {provided.placeholder}
+                    </ul>
+                  )}
+                </Droppable>
+              </DragDropContext>
+            </div>
           </div>
         </div>
       </div>
