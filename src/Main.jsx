@@ -45,9 +45,12 @@ function uuid4() {
 const Main = () => {
   const [songIds, setSongIds] = useState([]);
   const [songs, setSongs] = useState([]);
-  const [downloadReady, setDownloadReady] = useState(false);
+  // const [downloadReady, setDownloadReady] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [sessionId, setSessionId] = useState("");
+  const [songData, setSongData] = useState([]);
+  const [curYtId, setCurYtId] = useState("");
+  const [curStartTimeMs, setCurStartTimeMs] = useState(0);
 
   const addSong = (song) => {
     const newSongs = [...songs];
@@ -64,6 +67,25 @@ const Main = () => {
     setSongs(newSongs);
   };
 
+  const televise = () => {
+    let curDelayMs = 0;
+    console.log("televising...");
+    songData.forEach((song, index) => {
+      const chorus_length_ms = song.chorus_time_ms[1] - song.chorus_time_ms[0];
+      console.log(
+        `Playing ${song.title} by ${song.artist} for ${
+          chorus_length_ms / 1000
+        } seconds.`
+      );
+      setTimeout(() => {
+        console.log(index, song);
+        setCurYtId(song.yt_id);
+        setCurStartTimeMs(song.chorus_time_ms[0]);
+      }, curDelayMs);
+      curDelayMs += chorus_length_ms;
+    });
+  };
+
   const handleGenerate = () => {
     if (songs.length < 1 || isGenerating) {
       return;
@@ -74,7 +96,7 @@ const Main = () => {
     const newId = uuid4();
     setSessionId(newId);
     setIsGenerating(true);
-    setDownloadReady(false);
+    // setDownloadReady(false);
     axios
       .post("/api/bot/generate/", {
         songs: songs,
@@ -82,7 +104,10 @@ const Main = () => {
       })
       .then((response) => {
         setIsGenerating(false);
-        setDownloadReady(true);
+        console.log("response", response.data);
+        setSongData(response.data);
+        console.log("songdata:", response.data);
+        // setDownloadReady(true);
       })
       .catch((err) => {
         setIsGenerating(false);
@@ -141,7 +166,15 @@ const Main = () => {
 
   useEffect(() => {
     setupBeforeUnloadListener();
-  });
+    // if (songData.length > 0 && curVideoIndex < songData.length - 1) {
+    //   setInterval(() => {
+    //     setCurVideoIndex((prevIndex) => prevIndex + 1);
+    //   });
+    // }
+    if (songData.length > 0) {
+      televise();
+    }
+  }, [songData]);
 
   return (
     <ThemeProvider theme={theme}>
@@ -189,7 +222,8 @@ const Main = () => {
                   className="m-1"
                   onClick={handleDownload}
                   color="blue"
-                  variant={downloadReady ? "contained" : "disabled"}
+                  // variant={downloadReady ? "contained" : "disabled"}
+                  variant={"disabled"}
                 >
                   Download
                 </Button>
@@ -204,7 +238,9 @@ const Main = () => {
           </div>
 
           <div className="w-full ml-auto mr-auto max-w-sm p-2 mt-2">
-            <Tv />
+            <div id="tv-container" className="w-full h-[210px]">
+              <Tv yt_id={curYtId} start_time_s={curStartTimeMs / 1000} />
+            </div>
             <div
               id="songcards"
               className="w-full ml-auto mr-auto max-w-sm p-2 mt-2 h-fit shadow-sm flex flex-col gap-0 outline outline-1 outline-gray-200"

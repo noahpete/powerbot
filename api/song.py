@@ -86,15 +86,25 @@ class Song():
 
         self.chorus_time_ms = self.get_chorus_timestamps(lyrics)
 
-        try:
-            yt_video = self.download_yt_video()
-        except Exception as e:
-            self.is_valid = False
-            print(
-                f'Unable to initialize {self.title} by {self.artists[0]}. Error: {e}')
-        self.yt_video_duration_ms = yt_video.length * 1000
-        self.cut_yt_video()
-        self.is_valid = self.video_path and self.audio_path
+        if not DOWNLOAD_MODE:
+            search_term = self.title + ' ' + self.artists[0] + ' music video'
+            try:
+                self.yt_id = self.select_yt_video(search_term)
+            except Exception as e:
+                print(
+                    f'Unable to fetch {self.yt_id} for {search_term} from YouTube. Error: {e}')
+            return
+
+        if DOWNLOAD_MODE:
+            try:
+                yt_video = self.download_yt_video()
+            except Exception as e:
+                self.is_valid = False
+                print(
+                    f'Unable to initialize {self.title} by {self.artists[0]}. Error: {e}')
+            self.yt_video_duration_ms = yt_video.length * 1000
+            self.cut_yt_video()
+            self.is_valid = self.video_path and self.audio_path
 
     def get_chorus_timestamps(self, lyrics) -> list:
         """

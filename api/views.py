@@ -19,7 +19,7 @@ from rest_framework.response import Response
 from syrics.api import Spotify
 from .serializers import SongSerializer, BotSerializer
 from .models import Song, Songs
-from .config import SP_DC
+from .config import *
 from .bot import PowerBot
 
 
@@ -102,9 +102,7 @@ class BotView(viewsets.ModelViewSet):
         """
         Handle POST requests to /api/bot/generate/.
         """
-        # print('GENERATE DIR: ', os.getcwd())
-        # cleanup from last generation
-        if request.session.items():
+        if DOWNLOAD_MODE and request.session.items():
             prev_dir = Path(f'./api/{request.session["id"]}temp')
             prev_out = Path(f'./{request.session["id"]}output.mp4')
             if prev_dir.exists():
@@ -117,8 +115,10 @@ class BotView(viewsets.ModelViewSet):
         request.session['id'] = session_id
         songs = request.data['songs']
         bot = PowerBot(songs, session_id)
-        bot.generate()
-        return Response(session_id)
+        print('HERE!')
+        processed_songs = bot.generate()
+        print(processed_songs)
+        return Response(processed_songs)
 
     @action(detail=False, methods=['GET'], url_path='download', renderer_classes=(PassthroughRenderer,))
     def download(self, request):
@@ -143,7 +143,7 @@ class BotView(viewsets.ModelViewSet):
         Handle POST requests to /api/bot/clear/. Clear temporary files used
         for current user.
         """
-        if not request.data:
+        if not request.data or not DOWNLOAD_MODE:
             return HttpResponse(status=201)
 
         session_id = next(iter(request.data.dict().keys()))

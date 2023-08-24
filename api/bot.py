@@ -24,8 +24,9 @@ class PowerBot():
         self.removed = []
         self.id = uuid
 
-        self.work_dir = Path(
-            f'./api/{self.id}temp').mkdir(parents=True, exist_ok=True)
+        if DOWNLOAD_MODE:
+            self.work_dir = Path(
+                f'./api/{self.id}temp').mkdir(parents=True, exist_ok=True)
 
         for i, json in enumerate(song_jsons):
             try:
@@ -47,10 +48,12 @@ class PowerBot():
                 'title': song.title,
                 'artist': song.artists[0],
                 'yt_id': song.yt_id,
-                'chorus_time': song.chorus_time_ms
+                'chorus_time_ms': song.chorus_time_ms
             })
 
-        # TODO: retrieve from S3
+        if not DOWNLOAD_MODE:
+            return self.log
+
         paths = []
         for i in range(len(self.songs)):
             paths.append(f'./api/{self.id}temp/{self.id}{i}v.mp4')

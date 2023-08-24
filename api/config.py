@@ -1,6 +1,8 @@
 """API configuration file."""
 import boto3
 
+# functionality
+DOWNLOAD_MODE = False
 
 # keys
 SP_DC = 'AQBBl8RuaJ8Oab7AQynbfp084WVtSFXHRnM6IndflkNY1-541hgl6edRb2gI5Nvk6kgfoCeG02qTiiCn0vroCnatcckUMGTwbT5sLzkpDcBYXjn1sn0mgcwb6hzeYIzsO5xR97hsNv9M3xfR1VnF1Q1sYiim2Rgo'
