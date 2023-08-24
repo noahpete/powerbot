@@ -90,9 +90,29 @@ class Song():
             search_term = self.title + ' ' + self.artists[0] + ' music video'
             try:
                 self.yt_id = self.select_yt_video(search_term)
+                self.yt_video_duration_ms = YouTube(
+                    f'https://www.youtube.com/watch?v={self.yt_id}').length * 1000
             except Exception as e:
-                print(
+                raise Exception(
                     f'Unable to fetch {self.yt_id} for {search_term} from YouTube. Error: {e}')
+
+            chorus_time_from_end_ms = abs(
+                self.duration_ms - self.chorus_time_ms[0])
+            chorus_duration_ms = abs(
+                self.chorus_time_ms[1] - self.chorus_time_ms[0])
+
+            clip_start_ms = self.yt_video_duration_ms - chorus_time_from_end_ms
+            clip_end_ms = clip_start_ms + chorus_duration_ms + CHORUS_BUFFER_MS
+
+            # lengthen clip if too short
+            while abs(clip_end_ms - clip_start_ms) < MIN_CHORUS_LENGTH_MS:
+                clip_start_ms = max(0, clip_start_ms - 1000)
+                if not clip_start_ms:
+                    clip_end_ms = min(self.duration_ms, clip_end_ms + 1000)
+
+            # final times safety check
+            self.chorus_time_ms = [max(0, clip_start_ms), min(
+                self.duration_ms, clip_end_ms)]
             return
 
         if DOWNLOAD_MODE:
@@ -165,8 +185,6 @@ class Song():
         channel = Channel(video.channel_url)
         num_subs = self.get_subscriber_count(channel)
 
-        # TODO: add length check to not overwhelm heroku server
-
         for phrase in YT_PHRASES_BLACKLIST:
             if phrase in video.title:
                 print(
@@ -201,6 +219,15 @@ class Song():
         channel = Channel(video.channel_url)
         num_subs = self.get_subscriber_count(channel)
 
+        if self.title not in video.title:
+            return False
+
+        for phrase in YT_PHRASES_BLACKLIST:
+            if phrase in video.streams[0].title:
+                print(
+                    f"Video {yt_video_id}'s title contains a blacklisted phrase.")
+                return False
+
         for phrase in YT_PHRASES_WHITELIST:
             if phrase in video.streams[0].title:
                 print(f'Video {yt_video_id} has a desired phrase.')
@@ -216,15 +243,6 @@ class Song():
 
         if video.views > YT_VIEW_THRESHOLD:
             return True
-
-        for phrase in YT_PHRASES_BLACKLIST:
-            if phrase in video.streams[0].title:
-                print(
-                    f"Video {yt_video_id}'s title contains a blacklisted phrase.")
-                return False
-
-        if self.title not in video.title:
-            return False
 
         # video length too different from song length
         if abs(self.duration_ms - video.length * 1000) > YT_SONG_DIFF_THRESHOLD_MS:

@@ -51,7 +51,8 @@ const Main = () => {
   const [sessionId, setSessionId] = useState("");
   const [songData, setSongData] = useState([]);
   const [curYtId, setCurYtId] = useState("");
-  const [curStartTimeMs, setCurStartTimeMs] = useState(0);
+  const [curStartTimeMs, setCurStartTimeMs] = useState(null);
+  const [isLastSong, setIsLastSong] = useState(false);
 
   const addSong = (song) => {
     const newSongs = [...songs];
@@ -71,7 +72,9 @@ const Main = () => {
   const televise = () => {
     let curDelayMs = 0;
     console.log("televising...");
+    setCurYtId("");
     setIsTelevising(true);
+    setIsLastSong(false);
     songData.forEach((song, index) => {
       const chorus_length_ms = song.chorus_time_ms[1] - song.chorus_time_ms[0];
       console.log(
@@ -80,15 +83,18 @@ const Main = () => {
         } seconds.`
       );
       setTimeout(() => {
+        // if (isTelevising) {
         console.log(index, song);
         setCurYtId(song.yt_id);
         setCurStartTimeMs(song.chorus_time_ms[0]);
+        // }
       }, curDelayMs);
-      if (index == songData.length - 1) {
-        setIsTelevising(false);
-      }
       curDelayMs += chorus_length_ms;
     });
+    setTimeout(() => {
+      setIsTelevising(false);
+      setIsLastSong(true);
+    }, curDelayMs + 1000);
   };
 
   const handleGenerate = () => {
@@ -101,6 +107,8 @@ const Main = () => {
     const newId = uuid4();
     setSessionId(newId);
     setIsGenerating(true);
+    setIsTelevising(false);
+    setIsLastSong(false);
     setSongsReady(false);
     axios
       .post("/api/bot/generate/", {
@@ -171,15 +179,7 @@ const Main = () => {
 
   useEffect(() => {
     setupBeforeUnloadListener();
-    // if (songData.length > 0 && curVideoIndex < songData.length - 1) {
-    //   setInterval(() => {
-    //     setCurVideoIndex((prevIndex) => prevIndex + 1);
-    //   });
-    // }
-    // if (songData.length > 0) {
-    //   televise();
-    // }
-  }); // , [songData]
+  });
 
   return (
     <ThemeProvider theme={theme}>
@@ -252,9 +252,10 @@ const Main = () => {
                 width={370}
                 height={208}
                 controls={true}
-                playing={isTelevising}
+                playing={isTelevising || isLastSong}
               />
             </div>
+
             <div
               id="songcards"
               className="w-full ml-auto mr-auto max-w-sm p-2 mt-2 h-fit shadow-sm flex flex-col gap-0 outline outline-1 outline-gray-200"

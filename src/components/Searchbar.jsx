@@ -50,7 +50,7 @@ const Searchbar = ({ addFunction }) => {
 
   const handleInputChange = (event) => {
     const term = event.target.value;
-    setSearchTerm(term);
+    setSearchTerm(term.split(".").join(" "));
 
     if (debounceTimeoutRef.current) {
       clearTimeout(debounceTimeoutRef.current);

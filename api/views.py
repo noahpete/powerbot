@@ -115,9 +115,7 @@ class BotView(viewsets.ModelViewSet):
         request.session['id'] = session_id
         songs = request.data['songs']
         bot = PowerBot(songs, session_id)
-        print('HERE!')
         processed_songs = bot.generate()
-        print(processed_songs)
         return Response(processed_songs)
 
     @action(detail=False, methods=['GET'], url_path='download', renderer_classes=(PassthroughRenderer,))

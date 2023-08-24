@@ -1,5 +1,4 @@
 """API configuration file."""
-import boto3
 
 # functionality
 DOWNLOAD_MODE = False
@@ -31,10 +30,11 @@ VALID_LABELS = [
 
 # YouTube settings
 YT_PHRASES_WHITELIST = ['(Official Video)', '(Official Music Video)']
-YT_PHRASES_BLACKLIST = ['(DANCE VIDEO)', 'Tiny Desk', 'Reaction', '(Lyrics)']
+YT_PHRASES_BLACKLIST = ['(DANCE VIDEO)', 'Tiny Desk',
+                        'Reaction', 'Unofficial', '(Dance Video)']
 YT_TITLE_SUFFIX_BLACKLIST = [' -', ' (feat', '(with', '(Parody']
 YT_VIEW_THRESHOLD = 1000000
-YT_STATIC_THRESHOLD = 100
+YT_STATIC_THRESHOLD = 70
 YT_SONG_DIFF_THRESHOLD_MS = 60000
 YT_TIME_DIFF_FOR_OFFSET_S = 40
 YT_MIN_SUBSCRIBERS = 20000
@@ -52,7 +52,7 @@ SECTIONS_BY_PREFERENCE = [
 ]
 
 # S3 settings
-S3_SESSION = boto3.Session(
-    aws_access_key_id='',
-    aws_secret_access_key=''
-)
+# S3_SESSION = boto3.Session(
+#     aws_access_key_id='',
+#     aws_secret_access_key=''
+# )

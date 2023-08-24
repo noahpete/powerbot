@@ -36,7 +36,7 @@ class PowerBot():
                     self.songs.append(song)
             except Exception as e:
                 print(
-                    f'Could not add song with title {json["name"]}. Error: {e.with_traceback}')
+                    f'Could not add song with title {json["name"]}. Error: {e}')
 
     def generate(self):
         for song in self.songs:
