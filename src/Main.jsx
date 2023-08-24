@@ -83,11 +83,11 @@ const Main = () => {
         } seconds.`
       );
       setTimeout(() => {
-        // if (isTelevising) {
-        console.log(index, song);
-        setCurYtId(song.yt_id);
-        setCurStartTimeMs(song.chorus_time_ms[0]);
-        // }
+        if (isTelevising) {
+          console.log(index, song);
+          setCurYtId(song.yt_id);
+          setCurStartTimeMs(song.chorus_time_ms[0]);
+        }
       }, curDelayMs);
       curDelayMs += chorus_length_ms;
     });

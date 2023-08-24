@@ -360,7 +360,9 @@ class Song():
         attempts = 0
         while attempts < MAX_CONNECTION_ATTEMPTS:
             try:
-                yt = YouTube(f'https://www.youtube.com/watch?v={self.yt_id}')
+                yt = YouTube(f'https://www.youtube.com/watch?v={self.yt_id}',
+                             use_oauth=True,
+                             allow_oauth_cache=True)
 
                 # shift video clip start up a bit
                 if abs(yt.length - self.duration_ms / 1000) > YT_TIME_DIFF_FOR_OFFSET_S:
