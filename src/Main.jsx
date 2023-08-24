@@ -177,6 +177,22 @@ const Main = () => {
     });
   };
 
+  const fetchVideo = ({ videoUrl }) => {
+    // const options = {
+    //   headers: {
+    //     Authorization: `Bearer ${token}`,
+    //   },
+    // };
+    // const [url, setUrl] = useState();
+    // useEffect(() => {
+    //   fetch(videoUrl, options)
+    //     .then((response) => response.blob())
+    //     .then((blob) => {
+    //       setUrl(URL.createObjectURL(blob));
+    //     });
+    // }, [videoUrl]);
+  };
+
   useEffect(() => {
     setupBeforeUnloadListener();
   });
@@ -246,7 +262,7 @@ const Main = () => {
           <div className="w-full ml-auto mr-auto max-w-sm p-2 mt-2">
             <div id="tv-container" className="w-full h-[210px]">
               <ReactPlayer
-                url={`https://www.nsfwyoutube.com/watch?v=${curYtId}&t=${
+                url={`https://www.youtube.com/watch?v=${curYtId}&t=${
                   curStartTimeMs / 1000
                 }`}
                 width={370}
