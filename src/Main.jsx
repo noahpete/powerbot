@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import SongCard from "./components/SongCard";
 import Searchbar from "./components/Searchbar";
-import Tv from "./components/Tv";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Button, LinearProgress } from "@mui/material";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Logo from "./assets/powerbotlogo.png";
+import ReactPlayer from "react-player";
 
 const theme = createTheme({
   palette: {
@@ -45,8 +45,9 @@ function uuid4() {
 const Main = () => {
   const [songIds, setSongIds] = useState([]);
   const [songs, setSongs] = useState([]);
-  // const [downloadReady, setDownloadReady] = useState(false);
+  const [songsReady, setSongsReady] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isTelevising, setIsTelevising] = useState(false);
   const [sessionId, setSessionId] = useState("");
   const [songData, setSongData] = useState([]);
   const [curYtId, setCurYtId] = useState("");
@@ -70,6 +71,7 @@ const Main = () => {
   const televise = () => {
     let curDelayMs = 0;
     console.log("televising...");
+    setIsTelevising(true);
     songData.forEach((song, index) => {
       const chorus_length_ms = song.chorus_time_ms[1] - song.chorus_time_ms[0];
       console.log(
@@ -82,6 +84,9 @@ const Main = () => {
         setCurYtId(song.yt_id);
         setCurStartTimeMs(song.chorus_time_ms[0]);
       }, curDelayMs);
+      if (index == songData.length - 1) {
+        setIsTelevising(false);
+      }
       curDelayMs += chorus_length_ms;
     });
   };
@@ -96,7 +101,7 @@ const Main = () => {
     const newId = uuid4();
     setSessionId(newId);
     setIsGenerating(true);
-    // setDownloadReady(false);
+    setSongsReady(false);
     axios
       .post("/api/bot/generate/", {
         songs: songs,
@@ -107,7 +112,7 @@ const Main = () => {
         console.log("response", response.data);
         setSongData(response.data);
         console.log("songdata:", response.data);
-        // setDownloadReady(true);
+        setSongsReady(true);
       })
       .catch((err) => {
         setIsGenerating(false);
@@ -171,10 +176,10 @@ const Main = () => {
     //     setCurVideoIndex((prevIndex) => prevIndex + 1);
     //   });
     // }
-    if (songData.length > 0) {
-      televise();
-    }
-  }, [songData]);
+    // if (songData.length > 0) {
+    //   televise();
+    // }
+  }); // , [songData]
 
   return (
     <ThemeProvider theme={theme}>
@@ -220,12 +225,13 @@ const Main = () => {
                 </Button>
                 <Button
                   className="m-1"
-                  onClick={handleDownload}
+                  onClick={televise}
                   color="blue"
-                  // variant={downloadReady ? "contained" : "disabled"}
-                  variant={"disabled"}
+                  variant={
+                    songsReady && !isTelevising ? "contained" : "disabled"
+                  }
                 >
-                  Download
+                  {isTelevising ? "No stopping now..." : "Start"}
                 </Button>
               </div>
 
@@ -239,7 +245,15 @@ const Main = () => {
 
           <div className="w-full ml-auto mr-auto max-w-sm p-2 mt-2">
             <div id="tv-container" className="w-full h-[210px]">
-              <Tv yt_id={curYtId} start_time_s={curStartTimeMs / 1000} />
+              <ReactPlayer
+                url={`https://www.youtube.com/watch?v=${curYtId}&t=${
+                  curStartTimeMs / 1000
+                }`}
+                width={370}
+                height={208}
+                controls={true}
+                playing={isTelevising}
+              />
             </div>
             <div
               id="songcards"
