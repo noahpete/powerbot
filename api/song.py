@@ -342,13 +342,13 @@ class Song():
             print(
                 f'Skipped video with id {result["id"]} while searching for {self.title}.')
 
+        print('No good YouTube videos found.')
         for result in results:
             if self.yt_is_usable(result['id']):
                 return result['id']
             print(
                 f'Video with id {result["id"]} while searching for {self.title} is not usable.'
             )
-        print('No good YouTube videos found.')
         raise Exception('No usable YouTube videos found.')
 
     def yt_is_usable(self, yt_id) -> bool:

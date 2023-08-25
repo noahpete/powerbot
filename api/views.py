@@ -97,7 +97,7 @@ class BotView(viewsets.ModelViewSet):
     serializer_class = BotSerializer
     queryset = Songs.objects.all()
 
-    @action(detail=False, methods=['POST'], url_path='generate')
+    @action(detail=False, methods=['POST', 'GET'], url_path='generate')
     def generate(self, request):
         """
         Handle POST requests to /api/bot/generate/.
