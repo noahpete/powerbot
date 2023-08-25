@@ -93,8 +93,9 @@ class Song():
                 self.yt_video_duration_ms = YouTube(
                     f'https://www.youtube.com/watch?v={self.yt_id}').length * 1000
             except Exception as e:
-                raise Exception(
+                print(
                     f'Unable to fetch {self.yt_id} for {search_term} from YouTube. Error: {e}')
+                self.is_valid = False
 
             chorus_time_from_end_ms = abs(
                 self.duration_ms - self.chorus_time_ms[0])
@@ -246,8 +247,6 @@ class Song():
 
         # video length too different from song length
         if abs(self.duration_ms - video.length * 1000) > YT_SONG_DIFF_THRESHOLD_MS:
-            print('VID:', video.streams[0].default_filename)
-
             print(
                 f"Video {yt_video_id}'s length ({video.length}) is too different from its corresponding song's length ({self.duration_ms / 1000}).")
             return False
@@ -341,8 +340,31 @@ class Song():
                 return result['id']
             print(
                 f'Skipped video with id {result["id"]} while searching for {self.title}.')
+
+        for result in results:
+            if self.yt_is_usable(result['id']):
+                return result['id']
+            print(
+                f'Video with id {result["id"]} while searching for {self.title} is not usable.'
+            )
         print('No good YouTube videos found.')
-        raise Exception('No good YouTube videos found.')
+        raise Exception('No usable YouTube videos found.')
+
+    def yt_is_usable(self, yt_id) -> bool:
+        """
+        Determine if a YouTube video is adequate given its id.
+        """
+        video = YouTube(f'https://www.youtube.com/watch?v={yt_id}')
+        channel = Channel(video.channel_url)
+        num_subs = self.get_subscriber_count(channel)
+
+        if self.title in video.title and 'Music Video' in video.title:
+            return True
+
+        if self.title in video.title and 'Official Audio' in video.title:
+            return True
+
+        return False
 
     def download_yt_video(self):
         """
