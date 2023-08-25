@@ -96,6 +96,7 @@ class Song():
                 print(
                     f'Unable to fetch {self.yt_id} for {search_term} from YouTube. Error: {e}')
                 self.is_valid = False
+                return
 
             chorus_time_from_end_ms = abs(
                 self.duration_ms - self.chorus_time_ms[0])
