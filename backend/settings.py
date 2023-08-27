@@ -25,6 +25,7 @@ SP_DC = 'AQBBl8RuaJ8Oab7AQynbfp084WVtSFXHRnM6IndflkNY1-541hgl6edRb2gI5Nvk6kgfoCe
 DEBUG = False
 ALLOWED_HOSTS = ['powerbot.tv', '127.0.0.1:8000', 'localhost']
 SECURE_REFERRER_POLICY = "no-referrer-when-downgrade"
+SECURE_SSL_REDIRECT = True
 
 
 # static file config
