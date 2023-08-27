@@ -8,7 +8,7 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Logo from "./assets/powerbotlogo.png";
 import ReactPlayer from "react-player";
 
-const ADVANCE_SONG_FETCH_MS = 10000;
+const ADVANCE_SONG_FETCH_MS = -6000;
 
 const theme = createTheme({
   palette: {
@@ -81,7 +81,7 @@ const Main = () => {
     let curDelayMs = 0;
     for (const [index, song] of songs.entries()) {
       await new Promise((res) => {
-        setTimeout(res, curDelayMs * 0.85);
+        setTimeout(res, curDelayMs + ADVANCE_SONG_FETCH_MS);
       });
 
       try {
