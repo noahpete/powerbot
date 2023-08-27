@@ -8,6 +8,8 @@ import { ThemeProvider, createTheme } from "@mui/material/styles";
 import Logo from "./assets/powerbotlogo.png";
 import ReactPlayer from "react-player";
 
+const ADVANCE_SONG_FETCH_MS = 10000;
+
 const theme = createTheme({
   palette: {
     primary: {
@@ -69,42 +71,33 @@ const Main = () => {
     setSongs(newSongs);
   };
 
-  const televise = () => {
-    let curDelayMs = 0;
-
+  const televise = async () => {
     setCurYtId("");
     setIsTelevising(true);
     setIsLastSong(false);
 
-    songData.forEach((song, index) => {
-      const chorus_length_ms = song.chorus_time_ms[1] - song.chorus_time_ms[0];
-      console.log(
-        `Playing ${song.title} by ${song.artist} for ${
-          chorus_length_ms / 1000
-        } seconds.`
-      );
-      setTimeout(() => {
-        console.log(index, song);
-        setCurYtId(song.yt_id);
-        setCurStartTimeMs(song.chorus_time_ms[0]);
-      }, curDelayMs);
-      curDelayMs += chorus_length_ms;
-    });
-    setTimeout(() => {
-      setIsTelevising(false);
-      setIsLastSong(true);
-    }, curDelayMs + 1000);
+    console.log("songids", songs);
+
+    let curDelayMs = 0;
+    for (const [index, song] of songs.entries()) {
+      await new Promise((res) => {
+        setTimeout(res, curDelayMs * 0.85);
+      });
+
+      try {
+        const response = await axios.get(`/api/songs/${song.id}/`);
+        console.log("song data:", response.data);
+        console.log("cur delay:", curDelayMs);
+        setCurYtId(response.data.yt_id);
+        setCurStartTimeMs(response.data.start_time_ms);
+        curDelayMs = response.data.duration_ms;
+      } catch (error) {
+        console.error("Error fetching song data:", error);
+      }
+    }
   };
 
-  const televiseSong = (spotifyId) => {
-    axios.get(`/api/bot/songs/${spotifyId}/`).then((response) => {
-      console.log(response.data);
-      const songData = response.data;
-      setCurYtId(songData.yt_id);
-      setCurStartTimeMs(songData.chorus_time_ms[0]);
-      setCurDuration(songData.chorus_time_ms[1] - songData.chorus_time_ms[0]);
-    });
-  };
+  const televiseSong = (spotifyId) => {};
 
   const handleGenerate = () => {
     if (songs.length < 1 || isGenerating) {
@@ -220,25 +213,11 @@ const Main = () => {
                 </Button>
                 <Button
                   className="m-1"
-                  onClick={handleGenerate}
+                  onClick={televise}
                   color="red"
-                  variant={
-                    isGenerating || songs.length === 0
-                      ? "contained"
-                      : "contained"
-                  }
+                  variant="contained"
                 >
                   Generate
-                </Button>
-                <Button
-                  className="m-1"
-                  onClick={televise}
-                  color="blue"
-                  variant={
-                    songsReady && !isTelevising ? "contained" : "disabled"
-                  }
-                >
-                  {isTelevising ? "No stopping now..." : "Start"}
                 </Button>
               </div>
 

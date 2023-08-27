@@ -64,12 +64,19 @@ const Searchbar = ({ addFunction }) => {
     }, INPUT_REFRESH_MS);
   };
 
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    if (!searchTerm) {
+      return;
+    }
+  };
+
   return (
     <form onSubmit={(event) => handleSubmit(event)} autoComplete="off">
       <div className="bg-white flex shadow-sm p-1 outline outline-1 outline-gray-200 w-full h-8">
         <SearchIcon className="text-gray-400 ml-2" />
         <input
-          ref={inputRef}
+          ref={inputRef} // Add a reference to the input element
           className="bg-transparent w-full ml-2 outline-none border-none text-md"
           name="search-field"
           autoComplete="off"

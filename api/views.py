@@ -45,7 +45,7 @@ class SongView(viewsets.ModelViewSet):
             return Response({
                 'yt_id': song.yt_id,
                 'start_time_ms': song.chorus_time_ms[0],
-                'duration_ms': song.duration_ms
+                'duration_ms': song.chorus_time_ms[1] - song.chorus_time_ms[0]
             })
         except Exception as e:
             return Response(
