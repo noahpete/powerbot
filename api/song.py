@@ -4,7 +4,6 @@ A Song class containing information for each song in the playlist.
 import os
 import re
 import requests
-import boto3
 from pathlib import Path
 from time import sleep
 from pytube import YouTube, Channel
@@ -16,44 +15,14 @@ from .lyrics import Lyrics
 from .config import *
 
 
-def upload_video(file_name, file_path):
-    """
-    Upload a video to S3.
-    """
-    try:
-        # s3_bucket = os.environ.get('S3_BUCKET')
-        s3_bucket = 'powerbot-working-directory'
-        s3 = boto3.client('s3')
-        print('\n\n', s3_bucket, s3, '\n\n')
-        presigned_post = s3.generate_presigned_post(
-            Bucket=s3_bucket,
-            Key=file_name,
-            Fields={"acl": "public-read", "Content-Type": 'video/mp4'},
-            Conditions=[
-                {"acl": "public-read"},
-                {"Content-Type": 'video/mp4'}
-            ],
-            ExpiresIn=3600
-        )
-        print('PRESIGNED: ', presigned_post)
-        response = requests.post(
-            url=f'https://{s3_bucket}.s3.amazonaws.com/{file_name}',
-            data=presigned_post
-        )
-        print(response.text)
-    except Exception as e:
-        print(f'Error while uploading file {file_name}. Error: {e}')
-
-
 class Song():
 
-    def __init__(self, index: int, song_json: dict, uuid: str):
+    def __init__(self, song_json: dict):
         """
         Retrieve song information given its Spotify json.
         """
         self.is_valid = True
-        self.index = index
-        self.sp = Spotify(SP_DC)  # TODO: change to use from settings backend
+        self.sp = Spotify(SP_DC)
         self.genius = Genius(GENIUS_TOKEN)
         self.spotify_id = song_json['id']
         self.title = song_json['name']
@@ -66,7 +35,6 @@ class Song():
         self.audio_path = None
         self.lyrics = None
         self.chorus_present = True
-        self.id = uuid
 
         # clean up title
         for suffix in YT_TITLE_SUFFIX_BLACKLIST:
@@ -90,8 +58,10 @@ class Song():
             search_term = self.title + ' ' + self.artists[0] + ' music video'
             try:
                 self.yt_id = self.select_yt_video(search_term)
-                self.yt_video_duration_ms = YouTube(
-                    f'https://www.youtube.com/watch?v={self.yt_id}').length * 1000
+                print('ID:', self.yt_id)
+                video = YouTube(
+                    f'https://www.youtube.com/watch?v={self.yt_id}')
+                self.yt_video_duration_ms = video.length * 1000
             except Exception as e:
                 print(
                     f'Unable to fetch {self.yt_id} for {search_term} from YouTube. Error: {e}')
@@ -135,6 +105,10 @@ class Song():
         chorus_section, section_index = None, 0
         for label in SECTIONS_BY_PREFERENCE:
             for i, section in enumerate(lyrics.sections):
+                if not section:
+                    print(lyrics.sections)
+                    self.chorus_present = False
+                    break
                 if section.label == label and section.start_time_ms > CHORUS_MIN_START_TIME_MS:
                     chorus_section = section
                     section_index = i

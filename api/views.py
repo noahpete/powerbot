@@ -21,21 +21,11 @@ from .serializers import SongSerializer, BotSerializer
 from .models import Song, Songs
 from .config import *
 from .bot import PowerBot
+from .song import Song as SongObj
 
 
 def index(request):
     return render(request, 'index.html')
-
-
-class PassthroughRenderer(renderers.BaseRenderer):
-    """
-        Return data as-is. View should supply a Response.
-    """
-    media_type = ''
-    format = ''
-
-    def render(self, data, accepted_media_type=None, renderer_context=None):
-        return data
 
 
 class SongView(viewsets.ModelViewSet):
@@ -50,7 +40,13 @@ class SongView(viewsets.ModelViewSet):
         """
         try:
             sp = Spotify(SP_DC)
-            return Response(sp.tracks([song_id]))
+            print('HERE: ', sp.tracks([song_id])['tracks'][0])
+            song = SongObj(sp.tracks([song_id])['tracks'][0])
+            return Response({
+                'yt_id': song.yt_id,
+                'start_time_ms': song.chorus_time_ms[0],
+                'duration_ms': song.duration_ms
+            })
         except Exception as e:
             return Response(
                 {'message': f'Error when searching for lyrics for song with id {song_id}.',
@@ -116,24 +112,8 @@ class BotView(viewsets.ModelViewSet):
         songs = request.data['songs']
         bot = PowerBot(songs, session_id)
         processed_songs = bot.generate()
+        print('Generation complete. Songs:\n', processed_songs)
         return Response(processed_songs)
-
-    @action(detail=False, methods=['GET'], url_path='download', renderer_classes=(PassthroughRenderer,))
-    def download(self, request):
-        """
-        Handle GET requests to /api/bot/download/.
-        """
-        file_path = os.path.join(
-            f'{request.GET["sessionId"]}output.mp4')
-
-        if os.path.exists(file_path):
-            response = FileResponse(
-                open(file_path, 'rb'), content_type='video/mp4')
-            response['Content-Disposition'] = 'attachment; filename="output.mp4"'
-            return response
-        else:
-            print(f'File path {file_path} was not found.')
-            return HttpResponse(status=404)
 
     @action(detail=False, methods=['POST'], url_path='clear')
     def clear(self, request):
@@ -152,14 +132,3 @@ class BotView(viewsets.ModelViewSet):
         shutil.rmtree(f'./api/{session_id}temp')
         print(f'Removed directory: /api/{session_id}temp')
         return HttpResponse(status=200)
-
-
-class Assets(django.views.View):
-    def get(self, _request, filename):
-        path = os.path.join(os.path.dirname(__file__), 'static', filename)
-
-        if os.path.isfile(path):
-            with open(path, 'rb') as file:
-                return HttpResponse(file.read(), content_type='application/javascript')
-        else:
-            return HttpResponse(status=404)

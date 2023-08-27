@@ -25,9 +25,7 @@ const Searchbar = ({ addFunction }) => {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      // Cleanup function to remove the event listener when the component unmounts
       document.removeEventListener("mousedown", handleClickOutside);
-      // Cleanup function to clear the debounceTimeout when the component unmounts
       clearTimeout(debounceTimeoutRef.current);
     };
   }, [isExpanded, list]);
@@ -39,7 +37,6 @@ const Searchbar = ({ addFunction }) => {
     }
     try {
       const response = await fetch(`/api/songs/search/${searchTerm}/`);
-      // console.log(response);
       const data = await response.json();
       return data;
     } catch (error) {
@@ -67,19 +64,12 @@ const Searchbar = ({ addFunction }) => {
     }, INPUT_REFRESH_MS);
   };
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (!searchTerm) {
-      return;
-    }
-  };
-
   return (
     <form onSubmit={(event) => handleSubmit(event)} autoComplete="off">
       <div className="bg-white flex shadow-sm p-1 outline outline-1 outline-gray-200 w-full h-8">
         <SearchIcon className="text-gray-400 ml-2" />
         <input
-          ref={inputRef} // Add a reference to the input element
+          ref={inputRef}
           className="bg-transparent w-full ml-2 outline-none border-none text-md"
           name="search-field"
           autoComplete="off"

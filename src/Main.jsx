@@ -71,10 +71,11 @@ const Main = () => {
 
   const televise = () => {
     let curDelayMs = 0;
-    console.log("televising...");
+
     setCurYtId("");
     setIsTelevising(true);
     setIsLastSong(false);
+
     songData.forEach((song, index) => {
       const chorus_length_ms = song.chorus_time_ms[1] - song.chorus_time_ms[0];
       console.log(
@@ -83,11 +84,9 @@ const Main = () => {
         } seconds.`
       );
       setTimeout(() => {
-        // if (isTelevising) {
         console.log(index, song);
         setCurYtId(song.yt_id);
         setCurStartTimeMs(song.chorus_time_ms[0]);
-        // }
       }, curDelayMs);
       curDelayMs += chorus_length_ms;
     });
@@ -95,6 +94,16 @@ const Main = () => {
       setIsTelevising(false);
       setIsLastSong(true);
     }, curDelayMs + 1000);
+  };
+
+  const televiseSong = (spotifyId) => {
+    axios.get(`/api/bot/songs/${spotifyId}/`).then((response) => {
+      console.log(response.data);
+      const songData = response.data;
+      setCurYtId(songData.yt_id);
+      setCurStartTimeMs(songData.chorus_time_ms[0]);
+      setCurDuration(songData.chorus_time_ms[1] - songData.chorus_time_ms[0]);
+    });
   };
 
   const handleGenerate = () => {
@@ -117,9 +126,7 @@ const Main = () => {
       })
       .then((response) => {
         setIsGenerating(false);
-        console.log("response", response.data);
         setSongData(response.data);
-        console.log("songdata:", response.data);
         setSongsReady(true);
       })
       .catch((err) => {
@@ -175,22 +182,6 @@ const Main = () => {
       event.preventDefault();
       handleClear();
     });
-  };
-
-  const fetchVideo = ({ videoUrl }) => {
-    // const options = {
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //   },
-    // };
-    // const [url, setUrl] = useState();
-    // useEffect(() => {
-    //   fetch(videoUrl, options)
-    //     .then((response) => response.blob())
-    //     .then((blob) => {
-    //       setUrl(URL.createObjectURL(blob));
-    //     });
-    // }, [videoUrl]);
   };
 
   useEffect(() => {
