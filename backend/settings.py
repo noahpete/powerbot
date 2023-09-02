@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-$os=5yt==dh%4t8j&=g_=@h(zx3@0j_+938p3us49(h#lrgy$y'
 DEBUG = False
-ALLOWED_HOSTS = ['powerbot.tv', '127.0.0.1:8000', 'localhost']
+ALLOWED_HOSTS = ['powerbot.tv', '127.0.0.1:8000', 'localhost', '.powerbot.tv']
 SECURE_REFERRER_POLICY = "no-referrer-when-downgrade"
 
 
@@ -30,6 +30,14 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'build/static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+
+# django react tools
+REACT_PROJECT_DIRECTORY = '.'
+REACT_DJANGO_DEST = STATIC_ROOT
+REACT_MANIFEST_FILE = 'manifest.json'
+REACT_DEV_SERVER = 'http://localhost:3000/'
+REACT_DEV_MODE = True
 
 
 # Application definition

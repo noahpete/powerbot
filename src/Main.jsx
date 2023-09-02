@@ -12,7 +12,7 @@ import * as constants from "./constants";
 import logo from "./powerbotlogo.png";
 import Tv from "./components/Tv";
 
-const App = () => {
+const Main = () => {
   const [screenSize, setScreenSize] = useState(window.innerWidth);
   const [setlist, setSetlist] = useState([]);
   const [curYoutubeId, setCurYoutubeId] = useState("");
@@ -108,7 +108,7 @@ const App = () => {
 
   return (
     <ThemeProvider theme={constants.THEME}>
-      <div id="App" className="w-full h-full p-4">
+      <div id="Main" className="w-full h-full p-4">
         <div
           id="main-container"
           className="sm:flex max-w-[854px] w-full m-auto"
@@ -250,4 +250,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Main;
