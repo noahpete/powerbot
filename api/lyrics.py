@@ -26,9 +26,9 @@ class Lyrics():
         """
         Create a Lyrics object with information about the given lyrics.
         """
-        self.sections = self.parse_sections(genius_lyrics)
-        self.sections = self.sync_sections(
-            self.sections, spotify_lyrics['lines'])
+        sections = self.parse_sections(genius_lyrics)
+        self.sections = self.sync_sections(sections, spotify_lyrics['lines'])
+
 
     def parse_sections(self, genius_lyrics: str) -> dict:
         """
@@ -74,9 +74,6 @@ class Lyrics():
                     section.start_time_ms = line_start_time_ms
                     cur_time_ms = line_start_time_ms
                     break
-        print('\nSECTIONS:')
-        for section in sections:
-            print(section, '\n')
         return sections
 
 
@@ -84,14 +81,4 @@ def are_similar(a: str, b: str, threshold=0.65):
     """
     Return whether the two strings are similar enough according to a threshold.
     """
-    if not (difflib.SequenceMatcher(None, a, b).ratio() >= threshold):
-        # print(f'\nCalculated the following strings to NOT be the same:')
-        # print(f'  section: {a}')
-        # print(f'  spotify: {b}\n')
-        pass
-    else:
-        # print(f'\nCalculated the following strings to be the same:')
-        # print(f'  section: {a}')
-        # print(f'  spotify: {b}\n')
-        pass
     return difflib.SequenceMatcher(None, a, b).ratio() >= threshold

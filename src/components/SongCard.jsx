@@ -1,69 +1,69 @@
 import React from "react";
-import IconButton from "@mui/material/IconButton";
-import AddIcon from "@mui/icons-material/Add";
-import RemoveIcon from "@mui/icons-material/Remove";
+import { IconButton } from "@mui/material";
+import { Add, Remove } from "@mui/icons-material";
+import * as constants from "../constants";
 
-const MAX_ARTISTS_SHOWN = 10;
+const SongCard = ({
+  songData,
+  small = false,
+  addFunction,
+  removeFunction,
+  index,
+}) => {
+  const dimensions = small ? "h-12 w-12" : "h-20 w-20";
 
-const SongCard = ({ song, small = false, addFunction, removeFunction }) => {
   const handleAddSong = () => {
-    addFunction(song);
+    addFunction(songData);
   };
 
   const handleRemoveSong = () => {
-    removeFunction(song.id);
+    removeFunction(index);
   };
 
   return (
-    <div
-      draggable="true"
-      className="flex w-full p-0.5 transition ease-in hover:bg-gray-100"
-    >
-      <div className={`w-${small ? "12" : "20"} h-${small ? "12" : "20"}`}>
+    <div className="flex w-full p-0.5 transition ease-in hover:bg-gray-100">
+      <div id="album-art" className="flex-shrink-0">
         <img
-          alt="song album cover"
-          src={song?.album.images[1]?.url}
-          className="h-full w-full"
+          src={songData?.album.images[1]?.url}
+          className={`object-cover ${dimensions}`}
+          alt="album cover"
         />
       </div>
+
       <div
-        className={`ml-4 w-3/5 flex flex-col justify-center ${
-          small ? "h-12" : "h-20"
-        }`}
+        id="song-info"
+        className="ml-4 flex-grow flex flex-col justify-center overflow-hidden"
       >
         <h1
           className={`font-bold ${
             small ? "text-sm leading-none" : "text-lg"
           } truncate`}
         >
-          {song.name}
+          {songData.name}
         </h1>
         <p className={`font-light ${small ? "text-xs" : "text-sm"} truncate`}>
-          {song.artists.map(
+          {songData.artists.map(
             (artist, i) =>
               `${
-                i < MAX_ARTISTS_SHOWN
+                i < constants.MAX_ARTISTS_SHOWN
                   ? `${artist.name}${
-                      i === song.artists.length - 1 || i === 2 ? "" : ","
+                      i === songData.artists.length - 1 || i === 2 ? "" : ","
                     } `
                   : ""
               }`
           )}
         </p>
       </div>
-      {small ? (
-        <div className="aspect-square mr-0 ml-auto mt-1">
-          <IconButton onClick={handleAddSong}>
-            <AddIcon className="text-gray-400"></AddIcon>
-          </IconButton>
-        </div>
-      ) : (
-        <div className="aspect-square ml-auto mr-0 mt-[18px]">
-          <IconButton onClick={handleRemoveSong}>
-            <RemoveIcon className="text-gray-400"></RemoveIcon>
-          </IconButton>
-        </div>
-      )}
+
+      <div id="card-func" className="aspect-square">
+        <IconButton onClick={small ? handleAddSong : handleRemoveSong}>
+          {small ? (
+            <Add className="text-gray-400 mt-[2px]" />
+          ) : (
+            <Remove className="text-gray-400" />
+          )}
+        </IconButton>
+      </div>
     </div>
   );
 };

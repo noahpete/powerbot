@@ -1,21 +1,65 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import * as constants from "../constants";
 import SearchIcon from "@mui/icons-material/Search";
 import SongCard from "./SongCard";
 
-const Searchbar = ({ addFunction }) => {
-  const INPUT_REFRESH_MS = 500;
-
-  const [list, setList] = useState(null);
+const Searchbar = ({ songCardAddFunc, children }) => {
+  const [songList, setSongList] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
-  const debounceTimeoutRef = useRef(null);
+  const timeoutRef = useRef(null);
   const inputRef = useRef(null);
+
+  const fetchData = async (term) => {
+    if (!term || term.trim() === "") {
+      setSongList(null);
+      return;
+    }
+    axios
+      .get(`api/songs/search/${term}/`)
+      .then(async (res) => {
+        const data = await res.data;
+        console.log("data", data.items);
+        setSongList(data.items);
+        return data.items;
+      })
+      .catch((err) => {
+        // setIsPlaing(false) ?
+        console.error(err);
+      });
+  };
+
+  const handleInputChange = (e) => {
+    const term = e.target.value;
+    setSearchTerm(term.split(".").join(" "));
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
+
+    timeoutRef.current = setTimeout(async () => {
+      const data = await fetchData(term);
+      if (data) {
+        setSongList(data["items"]);
+      }
+      setIsExpanded(term.trim());
+      if (!term) setSongList(null);
+    }, constants.SEARCHBAR_REFRESH_MS);
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!searchTerm) {
+      return;
+    }
+  };
 
   useEffect(() => {
     // Event listener to handle clicks outside the input element
     const handleClickOutside = (event) => {
       if (
-        !list &&
+        !songList &&
         inputRef.current &&
         !inputRef.current.contains(event.target)
       ) {
@@ -25,86 +69,44 @@ const Searchbar = ({ addFunction }) => {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      // Cleanup function to remove the event listener when the component unmounts
+      // cleanup
       document.removeEventListener("mousedown", handleClickOutside);
-      // Cleanup function to clear the debounceTimeout when the component unmounts
-      clearTimeout(debounceTimeoutRef.current);
+      clearTimeout(timeoutRef.current);
     };
-  }, [isExpanded, list]);
-
-  const fetchData = async (searchTerm) => {
-    if (!searchTerm || searchTerm.trim() === "" || searchTerm === "") {
-      setList(null);
-      return;
-    }
-    try {
-      const response = await fetch(`/api/songs/search/${searchTerm}/`);
-      // console.log(response);
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      return null;
-    }
-  };
-
-  const handleInputChange = (event) => {
-    const term = event.target.value;
-    setSearchTerm(term.split(".").join(" "));
-
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-
-    debounceTimeoutRef.current = setTimeout(async () => {
-      const data = await fetchData(term);
-      if (data !== null) {
-        setList(data);
-      }
-      // Set isExpanded to false only if the searchTerm is empty
-      setIsExpanded(term.trim());
-      if (!searchTerm) setList(null);
-    }, INPUT_REFRESH_MS);
-  };
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    if (!searchTerm) {
-      return;
-    }
-  };
+  }, [isExpanded, songList]);
 
   return (
-    <form onSubmit={(event) => handleSubmit(event)} autoComplete="off">
-      <div className="bg-white flex shadow-sm p-1 outline outline-1 outline-gray-200 w-full h-8">
-        <SearchIcon className="text-gray-400 ml-2" />
-        <input
-          ref={inputRef} // Add a reference to the input element
-          className="bg-transparent w-full ml-2 outline-none border-none text-md"
-          name="search-field"
-          autoComplete="off"
-          id="search-field"
-          placeholder="Search for tracks, artists, albums..."
-          type="search"
-          value={searchTerm}
-          onChange={handleInputChange}
-          onFocus={() => setIsExpanded(true)}
-        />
-      </div>
-      <div
-        className={`mt-2 p-2 full outline outline-1 outline-gray-200 transition-height duration-500 ease-in-out h-8 ${
-          isExpanded ? "h-fit" : "h-0"
-        }`}
-      >
-        {list?.tracks.items.map((item, i) => (
-          <SongCard
-            addFunction={addFunction}
-            key={i}
-            song={item}
-            i={i}
-            small={true}
+    <form className="flex w-full" onSubmit={(e) => handleSubmit(e)}>
+      <div id="searchbar-container" className=" w-full">
+        <div
+          id="searchbar"
+          className={`${constants.COMPONENT_MT} bg-white flex shadow-sm p-1 outline outline-1 outline-gray-200 h-8`}
+        >
+          <SearchIcon className="text-gray-400 ml-2" />
+          <input
+            placeholder="Search for tracks, artists, albums..."
+            value={searchTerm}
+            onChange={handleInputChange}
+            onFocus={() => setIsExpanded(true)}
+            className="bg-transparent w-full ml-2 outline-none border-none text-md"
           />
-        ))}
+        </div>
+
+        <div
+          id="songs"
+          className={`${constants.COMPONENT_MT} w-full opacity-${
+            isExpanded ? "100" : "0"
+          } outline outline-[#E5E7EB] outline-1`}
+        >
+          {songList?.map((song, i) => (
+            <SongCard
+              songData={song}
+              small={true}
+              addFunction={songCardAddFunc}
+              key={i}
+            />
+          ))}
+        </div>
       </div>
     </form>
   );

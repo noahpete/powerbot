@@ -1,14 +1,11 @@
 from rest_framework import serializers
-from .models import Song, Songs
-
+from .models import SongModel
 
 class SongSerializer(serializers.ModelSerializer):
+    """
+    Serializer for /api/songs/ paths.
+    """
     class Meta:
-        model = Song
-        fields = ('song_id', 'title', 'artists')
+        model = SongModel
+        fields = ('spotify_id', 'youtube_id', 'title', 'artists', 'chorus_start_ms', 'chorus_duration_ms')
 
-
-class BotSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Songs
-        fields = ('list_id', 'song_list')

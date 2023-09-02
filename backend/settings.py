@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-import django_heroku
 import os
 from pathlib import Path
 
@@ -21,7 +20,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-$os=5yt==dh%4t8j&=g_=@h(zx3@0j_+938p3us49(h#lrgy$y'
-SP_DC = 'AQBBl8RuaJ8Oab7AQynbfp084WVtSFXHRnM6IndflkNY1-541hgl6edRb2gI5Nvk6kgfoCeG02qTiiCn0vroCnatcckUMGTwbT5sLzkpDcBYXjn1sn0mgcwb6hzeYIzsO5xR97hsNv9M3xfR1VnF1Q1sYiim2Rgo'
 DEBUG = False
 ALLOWED_HOSTS = ['powerbot.tv', '127.0.0.1:8000', 'localhost']
 SECURE_REFERRER_POLICY = "no-referrer-when-downgrade"
@@ -32,14 +30,6 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'build/static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-
-
-# django react tools
-REACT_PROJECT_DIRECTORY = '.'
-REACT_DJANGO_DEST = STATIC_ROOT
-REACT_MANIFEST_FILE = 'manifest.json'
-REACT_DEV_SERVER = 'http://localhost:3000/'
-REACT_DEV_MODE = True
 
 
 # Application definition
@@ -54,7 +44,6 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'api',
-    'reacttools',
 ]
 
 MIDDLEWARE = [
@@ -145,14 +134,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ORIGIN_WHITELIST = [
     'http://localhost:3000',
     'http://127.0.0.1:3000',
-    'http://powerbot-1f0600cd4beb.herokuapp.com',
-    'http://powerbot-herokuapp.com',
-    'https://powerbot-1f0600cd4beb.herokuapp.com',
-    'https://powerbot-herokuapp.com',
-    'http://powerbot-1f0600cd4beb.herokuapp.com:3000',
-    'http://powerbot-herokuapp.com:3000',
-    'https://powerbot-1f0600cd4beb.herokuapp.com:3000',
-    'https://powerbot-herokuapp.com:3000',
 ]
 
-django_heroku.settings(locals())

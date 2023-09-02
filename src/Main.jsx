@@ -1,305 +1,222 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
-import SongCard from "./components/SongCard";
-import Searchbar from "./components/Searchbar";
+import { Button, IconButton } from "@mui/material";
+import { ThemeProvider } from "@mui/material/styles";
+import ShuffleIcon from "@mui/icons-material/Shuffle";
+import RepeatIcon from "@mui/icons-material/RestartAlt";
+import PlayIcon from "@mui/icons-material/PlayArrow";
+import StopIcon from "@mui/icons-material/Stop";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { Button, LinearProgress } from "@mui/material";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import Logo from "./assets/powerbotlogo.png";
-import ReactPlayer from "react-player";
+import { Controls, Searchbar, SongCard } from "./components";
+import * as constants from "./constants";
+import logo from "./powerbotlogo.png";
+import Tv from "./components/Tv";
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      main: "#ffffff",
-    },
-    secondary: {
-      main: "#94a3b8",
-    },
-    blue: {
-      main: "#00B0E9",
-      contrastText: "#fff",
-    },
-    red: {
-      main: "#C01B22",
-      contrastText: "#fff",
-    },
-    yellow: {
-      main: "#F5B11B",
-      contrastText: "#fff",
-    },
-  },
-  typography: {
-    fontFamily: ['"Segoe UI"', "Helvetica", "Arial", "Roboto"].join(","),
-  },
-});
+const App = () => {
+  const [screenSize, setScreenSize] = useState(window.innerWidth);
+  const [setlist, setSetlist] = useState([]);
+  const [curYoutubeId, setCurYoutubeId] = useState("");
+  const [curStartMs, setCurStartMs] = useState(0);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [timeoutId, setTimeoutId] = useState(null);
+  const [curIndex, setCurIndex] = useState(0);
 
-function uuid4() {
-  return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
-    const r = (Math.random() * 16) | 0,
-      v = c === "x" ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
-
-const Main = () => {
-  const [songIds, setSongIds] = useState([]);
-  const [songs, setSongs] = useState([]);
-  const [songsReady, setSongsReady] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [isTelevising, setIsTelevising] = useState(false);
-  const [sessionId, setSessionId] = useState("");
-  const [songData, setSongData] = useState([]);
-  const [curYtId, setCurYtId] = useState("");
-  const [curStartTimeMs, setCurStartTimeMs] = useState(null);
-  const [isLastSong, setIsLastSong] = useState(false);
-
-  const addSong = (song) => {
-    const newSongs = [...songs];
-    newSongs.push(song);
-    setSongs(newSongs);
+  const addToSetlist = (song) => {
+    setCurIndex(0);
+    if (setlist.length >= constants.MAX_SETLIST_LENGTH) return;
+    const newSetlist = [...setlist];
+    newSetlist.push(song);
+    setSetlist(newSetlist);
   };
 
-  const removeSong = (songId) => {
-    const newSongs = [...songs];
-    const idxToRemove = songs.findIndex((song) => song.id === songId);
-    if (idxToRemove !== -1) {
-      newSongs.splice(idxToRemove, 1);
-    }
-    setSongs(newSongs);
-  };
-
-  const televise = () => {
-    let curDelayMs = 0;
-    console.log("televising...");
-    setCurYtId("");
-    setIsTelevising(true);
-    setIsLastSong(false);
-    songData.forEach((song, index) => {
-      const chorus_length_ms = song.chorus_time_ms[1] - song.chorus_time_ms[0];
-      console.log(
-        `Playing ${song.title} by ${song.artist} for ${
-          chorus_length_ms / 1000
-        } seconds.`
-      );
-      setTimeout(() => {
-        // if (isTelevising) {
-        console.log(index, song);
-        setCurYtId(song.yt_id);
-        setCurStartTimeMs(song.chorus_time_ms[0]);
-        // }
-      }, curDelayMs);
-      curDelayMs += chorus_length_ms;
-    });
-    setTimeout(() => {
-      setIsTelevising(false);
-      setIsLastSong(true);
-    }, curDelayMs + 1000);
-  };
-
-  const handleGenerate = () => {
-    if (songs.length < 1 || isGenerating) {
-      return;
-    }
-    if (sessionId) {
-      handleClear();
-    }
-    const newId = uuid4();
-    setSessionId(newId);
-    setIsGenerating(true);
-    setIsTelevising(false);
-    setIsLastSong(false);
-    setSongsReady(false);
-    axios
-      .post("/api/bot/generate/", {
-        songs: songs,
-        sessionId: newId,
-      })
-      .then((response) => {
-        setIsGenerating(false);
-        console.log("response", response.data);
-        setSongData(response.data);
-        console.log("songdata:", response.data);
-        setSongsReady(true);
-      })
-      .catch((err) => {
-        setIsGenerating(false);
-        console.log(err);
-      });
-  };
-
-  const handleDownload = () => {
-    if (isGenerating) {
-      return;
-    }
-    const config = {
-      method: "GET",
-      url: "/api/bot/download/",
-      responseType: "blob",
-      maxContentLength: Infinity,
-      maxBodyLength: Infinity,
-      params: {
-        sessionId: sessionId,
-      },
-    };
-
-    axios(config).then((response) => {
-      const link = document.createElement("a");
-      link.target = "_blank";
-      link.download = "output.mp4";
-      link.href = URL.createObjectURL(
-        new Blob([response.data], { type: "video/mp4" })
-      );
-      link.click();
-    });
+  const removeFromSetlist = (songIndex) => {
+    setCurIndex(0);
+    const newSetlist = [...setlist];
+    newSetlist.splice(songIndex, 1);
+    setSetlist(newSetlist);
   };
 
   const handleShuffle = () => {
-    const newSongs = [...songs];
-    for (let i = newSongs.length - 1; i > 0; i--) {
+    setCurIndex(0);
+    const newSetlist = [...setlist];
+    for (let i = newSetlist.length - 1; i > 0; i--) {
       let j = Math.floor(Math.random() * (i + 1));
-      let temp = newSongs[i];
-      newSongs[i] = newSongs[j];
-      newSongs[j] = temp;
+      let temp = newSetlist[i];
+      newSetlist[i] = newSetlist[j];
+      newSetlist[j] = temp;
     }
-    console.log(newSongs);
-    setSongs(newSongs);
+    setSetlist(newSetlist);
   };
 
-  const handleClear = () => {
-    axios.post("/api/bot/clear/", sessionId);
+  const handlePlay = async (usedIndex) => {
+    if (setlist.length < 1) return;
+
+    setCurYoutubeId("");
+    setIsPlaying(true);
+
+    let curDelayMs = 0;
+    for (const [index, song] of setlist.entries()) {
+      if (index < usedIndex) {
+        continue;
+      }
+      await new Promise((res) => {
+        const newTimeoutId = setTimeout(
+          res,
+          curDelayMs + constants.ADVANCE_SONG_FETCH_MS
+        );
+        setTimeoutId(newTimeoutId);
+      });
+
+      try {
+        const response = await axios.get(`/api/songs/${song.id}/`);
+        setCurIndex(index);
+        setCurYoutubeId(response.data.youtube_id);
+        setCurStartMs(response.data.start_time_ms);
+        curDelayMs = response.data.duration_ms;
+      } catch (error) {
+        console.error("Error fetching song data:", error);
+      }
+    }
   };
 
-  const setupBeforeUnloadListener = () => {
-    window.addEventListener("beforeunload", (event) => {
-      event.preventDefault();
-      handleClear();
-    });
+  const handleRestart = () => {
+    const newIndex = 0;
+    setCurIndex(newIndex);
+    handlePlay(newIndex);
   };
 
-  const fetchVideo = ({ videoUrl }) => {
-    // const options = {
-    //   headers: {
-    //     Authorization: `Bearer ${token}`,
-    //   },
-    // };
-    // const [url, setUrl] = useState();
-    // useEffect(() => {
-    //   fetch(videoUrl, options)
-    //     .then((response) => response.blob())
-    //     .then((blob) => {
-    //       setUrl(URL.createObjectURL(blob));
-    //     });
-    // }, [videoUrl]);
+  const handleStop = () => {
+    setIsPlaying(false);
+    // Clear the current timeout if it exists
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId);
+      // Reset the timeout ID in the state
+      setTimeoutId(null);
+    }
+  };
+
+  const handleResize = () => {
+    setScreenSize(window.innerWidth);
   };
 
   useEffect(() => {
-    setupBeforeUnloadListener();
-  });
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
-    <ThemeProvider theme={theme}>
-      <div className="w-full h-full p-4">
-        <div id="container" className="md:flex max-w-[854px] w-full m-auto">
-          <div id="control" className="max-w-sm m-auto">
-            <div id="logo" className="">
-              <img src={Logo} className="" alt="logo" />
-            </div>
-            <div id="searchbar-and-buttons" className="w-full mt-4">
-              <div className="">
-                {isGenerating ? (
-                  <>
-                    <LinearProgress color="blue" className="h-[4px] w-full" />
-                  </>
-                ) : (
-                  <div className="h-[4px]"></div>
-                )}
-              </div>
-
-              <div id="buttons" className="flex justify-center mb-2">
-                <Button
-                  className="m-1"
-                  color="secondary"
-                  variant={
-                    !isGenerating && songs.length > 1 ? "outlined" : "outlined"
-                  }
-                  onClick={handleShuffle}
-                >
-                  Shuffle
-                </Button>
-                <Button
-                  className="m-1"
-                  onClick={handleGenerate}
-                  color="red"
-                  variant={
-                    isGenerating || songs.length === 0
-                      ? "contained"
-                      : "contained"
-                  }
-                >
-                  Generate
-                </Button>
-                <Button
-                  className="m-1"
-                  onClick={televise}
-                  color="blue"
-                  variant={
-                    songsReady && !isTelevising ? "contained" : "disabled"
-                  }
-                >
-                  {isTelevising ? "No stopping now..." : "Start"}
-                </Button>
-              </div>
-
-              <Searchbar
-                songIds={songIds}
-                setSongIds={setSongIds}
-                addFunction={addSong}
-              />
-            </div>
-          </div>
-
-          <div className="w-full ml-auto mr-auto max-w-sm p-2 mt-2">
-            <div id="tv-container" className="w-full h-[210px]">
-              <ReactPlayer
-                url={`https://www.youtube.com/watch?v=${curYtId}&t=${
-                  curStartTimeMs / 1000
-                }`}
-                width={370}
-                height={208}
-                controls={true}
-                playing={isTelevising || isLastSong}
-              />
-            </div>
-
-            <div
-              id="songcards"
-              className="w-full ml-auto mr-auto max-w-sm p-2 mt-2 h-fit shadow-sm flex flex-col gap-0 outline outline-1 outline-gray-200"
-            >
-              {songs.length === 0 ? (
-                <p className="ml-2 text-gray-400 text-center">
-                  Got some work to do...
-                </p>
+    <ThemeProvider theme={constants.THEME}>
+      <div id="App" className="w-full h-full p-4">
+        <div
+          id="main-container"
+          className="sm:flex max-w-[854px] w-full m-auto"
+        >
+          <div
+            id="left-col"
+            className={`p-2 ${
+              screenSize < constants.MAX_SINGLE_COL_WIDTH ? "w-full" : "w-1/2"
+            }`}
+          >
+            <img src={logo} alt="logo" />
+            <div id="tv" className={constants.COMPONENT_MT}>
+              {screenSize < constants.MAX_SINGLE_COL_WIDTH ? (
+                <Tv
+                  youtubeId={curYoutubeId}
+                  startTimeS={Math.floor(curStartMs / 1000)}
+                  playing={isPlaying}
+                />
               ) : (
                 ""
               )}
+            </div>
+            <Controls>
+              <IconButton
+                color="secondary"
+                disabled={setlist.length < 2 || isPlaying}
+                onClick={handleShuffle}
+              >
+                <ShuffleIcon />
+              </IconButton>
+              <IconButton
+                color="yellow"
+                disabled={setlist.length < 1 || isPlaying}
+                onClick={handleRestart}
+              >
+                <RepeatIcon />
+              </IconButton>
+              <IconButton
+                color="blue"
+                disabled={setlist.length < 1 || isPlaying}
+                onClick={() => handlePlay(curIndex)}
+              >
+                <PlayIcon />
+              </IconButton>
+              <IconButton
+                color="red"
+                disabled={!isPlaying}
+                onClick={handleStop}
+              >
+                <StopIcon />
+              </IconButton>
+              <p className={`${constants.COMPONENT_MT} ml-2`}>
+                # tracks: {setlist.length} / {constants.MAX_SETLIST_LENGTH}
+              </p>
+              <p className={`${constants.COMPONENT_MT}`}>
+                , current track: {curIndex + 1}
+              </p>
+            </Controls>
+
+            <Searchbar songCardAddFunc={addToSetlist} />
+          </div>
+
+          <div
+            id="right-col"
+            className={
+              screenSize < constants.MAX_SINGLE_COL_WIDTH ? "w-full" : "w-1/2"
+            }
+          >
+            {screenSize < constants.MAX_SINGLE_COL_WIDTH ? (
+              ""
+            ) : (
+              <Tv
+                youtubeId={curYoutubeId}
+                startTimeS={Math.floor(curStartMs / 1000)}
+                playing={isPlaying}
+              />
+            )}
+            <div
+              id="setlist"
+              className={
+                isPlaying ? "pointer-events-none opacity-40 mt-2" : "mt-2"
+              }
+            >
               <DragDropContext
-                onDragEnd={(res) => {
-                  if (!res.destination) return;
-                  const items = Array.from(songs);
-                  const [reorderedItem] = items.splice(res.source.index, 1);
-                  items.splice(res.destination.index, 0, reorderedItem);
-                  setSongs(items);
+                onDragEnd={(dropResult) => {
+                  setCurIndex(0);
+                  if (!dropResult.destination) return;
+                  const newSetlist = [...setlist];
+                  const [reorderedSetlist] = newSetlist.splice(
+                    dropResult.source.index,
+                    1
+                  );
+                  newSetlist.splice(
+                    dropResult.destination.index,
+                    0,
+                    reorderedSetlist
+                  );
+                  setSetlist(newSetlist);
                 }}
               >
-                <Droppable droppableId="songs">
+                <Droppable droppableId="setlist">
                   {(provided) => (
                     <ul
-                      className="songs divide-y divide-gray-200"
+                      className="setlist divide-y divide-gray-200 outline outline-gray-200 outline-1"
                       {...provided.droppableProps}
                       ref={provided.innerRef}
                     >
-                      {songs.map((song, i) => (
+                      {setlist.map((song, i) => (
                         <Draggable
                           key={`${song.id}${i}`}
                           draggableId={`${song.id}${i}`}
@@ -312,9 +229,9 @@ const Main = () => {
                               ref={provided.innerRef}
                             >
                               <SongCard
-                                song={song}
-                                i={i}
-                                removeFunction={removeSong}
+                                songData={song}
+                                removeFunction={removeFromSetlist}
+                                index={i}
                               />
                             </li>
                           )}
@@ -333,4 +250,4 @@ const Main = () => {
   );
 };
 
-export default Main;
+export default App;
