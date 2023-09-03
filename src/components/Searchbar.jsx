@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import SearchIcon from "@mui/icons-material/Search";
 import SongCard from "./SongCard";
 
 const Searchbar = ({ addFunction }) => {
   const INPUT_REFRESH_MS = 500;
 
-  const [list, setList] = useState(null);
+  const [list, setList] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [isExpanded, setIsExpanded] = useState(false);
   const debounceTimeoutRef = useRef(null);
@@ -25,27 +26,27 @@ const Searchbar = ({ addFunction }) => {
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      // Cleanup function to remove the event listener when the component unmounts
       document.removeEventListener("mousedown", handleClickOutside);
-      // Cleanup function to clear the debounceTimeout when the component unmounts
       clearTimeout(debounceTimeoutRef.current);
     };
   }, [isExpanded, list]);
 
-  const fetchData = async (searchTerm) => {
-    if (!searchTerm || searchTerm.trim() === "" || searchTerm === "") {
+  const fetchData = async (term) => {
+    if (!term || term.trim() === "") {
       setList(null);
       return;
     }
-    try {
-      const response = await fetch(`/api/songs/search/${searchTerm}/`);
-      // console.log(response);
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      return null;
-    }
+    axios
+      .get(`api/songs/search/${term}/`)
+      .then(async (res) => {
+        const data = await res.data;
+        console.log("data", data.items);
+        setList(data.items);
+        return data.items;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
   };
 
   const handleInputChange = (event) => {
@@ -92,17 +93,16 @@ const Searchbar = ({ addFunction }) => {
         />
       </div>
       <div
-        className={`mt-2 p-2 full outline outline-1 outline-gray-200 transition-height duration-500 ease-in-out h-8 ${
+        className={`mt-2 full outline outline-1 outline-gray-200 transition-height duration-500 ease-in-out h-8 ${
           isExpanded ? "h-fit" : "h-0"
         }`}
       >
-        {list?.tracks.items.map((item, i) => (
+        {list?.map((song, i) => (
           <SongCard
+            song={song}
+            small={true}
             addFunction={addFunction}
             key={i}
-            song={item}
-            i={i}
-            small={true}
           />
         ))}
       </div>

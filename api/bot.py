@@ -2,12 +2,10 @@
 Powerbot playlist generator.
 """
 import os
-import boto3
 from syrics.api import Spotify
 from lyricsgenius import Genius
 from .config import *
 from pathlib import Path
-from moviepy.editor import ImageClip, VideoFileClip, concatenate_videoclips, vfx, afx, CompositeVideoClip
 from .song import Song
 
 
@@ -65,10 +63,10 @@ class PowerBot():
                 print('PATH DOESN"T EXIST WOMP WOMP')
                 continue
             try:
-                clip = VideoFileClip(file).resize(OUT_DIMENSIONS)
-                img = ImageClip(BG_IMAGE, duration=clip.duration)
-                comp = CompositeVideoClip(
-                    [img, clip]).set_duration(clip.duration).fx(vfx.fadein, FADE_DURATION_S).fx(vfx.fadeout, FADE_DURATION_S).afx(afx.audio_fadein, FADE_DURATION_S).afx(afx.audio_fadeout, FADE_DURATION_S)
+                # clip = VideoFileClip(file).resize(OUT_DIMENSIONS)
+                # img = ImageClip(BG_IMAGE, duration=clip.duration)
+                # comp = CompositeVideoClip(
+                #     [img, clip]).set_duration(clip.duration).fx(vfx.fadein, FADE_DURATION_S).fx(vfx.fadeout, FADE_DURATION_S).afx(afx.audio_fadein, FADE_DURATION_S).afx(afx.audio_fadeout, FADE_DURATION_S)
                 comp = comp
                 clips.append(comp)
                 total_duration_s += comp.duration
@@ -90,9 +88,10 @@ class PowerBot():
         attempts = 0
         while attempts < MAX_CONNECTION_ATTEMPTS:
             try:
-                final = concatenate_videoclips(
-                    clips).set_duration(total_duration_s)
-                final.write_videofile(f'./{self.id}output.mp4')
+                # final = concatenate_videoclips(
+                #     clips).set_duration(total_duration_s)
+                # final.write_videofile(f'./{self.id}output.mp4')
+                pass
                 for val in self.log:
                     print(
                         f'{val["title"]} by {val["artist"]}, used time {val["chorus_time"]} in video {val["yt_id"]}')

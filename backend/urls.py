@@ -22,11 +22,9 @@ from api import views
 
 router = routers.DefaultRouter()
 router.register(r'songs', views.SongView, 'song')
-router.register(r'bot', views.BotView, 'bot')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)),
-    path('reacttools/', include('reacttools.urls')),
     path('', views.index)
 ]
