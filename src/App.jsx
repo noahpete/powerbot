@@ -39,6 +39,12 @@ const App = () => {
     }
     setSetlist(newSetlist);
   };
+  const removeeFromSetlist = (songIndex) => {
+    setCurIndex(0);
+    const newSetlist = [...setlist];
+    newSetlist.splice(songIndex, 1);
+    setSetlist(newSetlist);
+  };
 
   const handleShuffle = () => {
     setCurIndex(0);
@@ -248,7 +254,7 @@ const App = () => {
                             >
                               <SongCard
                                 song={song}
-                                removeFunction={removeFromSetlist}
+                                removeFunction={removeeFromSetlist}
                                 index={i}
                               />
                             </li>

@@ -5,13 +5,19 @@ import RemoveIcon from "@mui/icons-material/Remove";
 
 const MAX_ARTISTS_SHOWN = 10;
 
-const SongCard = ({ song, small = false, addFunction, removeFunction }) => {
+const SongCard = ({
+  song,
+  index,
+  small = false,
+  addFunction,
+  removeFunction,
+}) => {
   const handleAddSong = () => {
     addFunction(song);
   };
 
   const handleRemoveSong = () => {
-    removeFunction(song.id);
+    removeFunction(index);
   };
 
   return (
