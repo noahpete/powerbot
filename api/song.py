@@ -15,7 +15,7 @@ class Song():
         Retrieve song information given its Spotify json.
         """
         self.is_valid = True
-        self.title = re.sub(r'\([^)]*\)', '', song_json['name'])
+        self.title = re.sub(r' \([^)]*\)', '', song_json['name'])
         self.artists = [artist['name'] for artist in song_json['artists']]
         self.duration_ms = int(song_json['duration_ms'])
 
