@@ -151,6 +151,7 @@ const App = () => {
             ) : (
               <div className="h-[8px]" />
             )}
+
             <Controls isLoading={isLoading}>
               <IconButton
                 color="secondary"
@@ -187,8 +188,13 @@ const App = () => {
                 , current track: {isPlaying ? curIndex + 1 : "-"}
               </p>
             </Controls>
-
-            <Searchbar addFunction={addToSetlist} />
+            <div
+              className={
+                isPlaying ? "pointer-events-none opacity-40 mt-2" : "mt-2"
+              }
+            >
+              <Searchbar addFunction={addToSetlist} />
+            </div>
           </div>
 
           <div
