@@ -30,10 +30,13 @@ const App = () => {
     setSetlist(newSetlist);
   };
 
-  const removeFromSetlist = (songIndex) => {
+  const removeFromSetlist = (songId) => {
     setCurIndex(0);
     const newSetlist = [...setlist];
-    newSetlist.splice(songIndex, 1);
+    const indexToRemove = setlist.findIndex((song) => song.id === songId);
+    if (indexToRemove !== -1) {
+      newSetlist.splice(indexToRemove, 1);
+    }
     setSetlist(newSetlist);
   };
 
