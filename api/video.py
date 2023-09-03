@@ -7,16 +7,18 @@ from youtubesearchpython import VideosSearch
 from .config import *
 from requests import head
 
+
 class Video():
-    
+
     def __init__(self, song_json: dict, search_term: str):
         """
         Retrieve YouTube video information given a search term.
         """
-        self.song_title = song_json['name']
+        self.song_title = re.sub(r' \([^)]*\)', '', song_json['name'])
         self.song_json = song_json
         self.youtube_id = self.select_video(search_term)
-        self.duration_s = YouTube(f'https://www.youtube.com/watch?v={self.youtube_id}').length
+        self.duration_s = YouTube(
+            f'https://www.youtube.com/watch?v={self.youtube_id}').length
 
     def select_video(self, search_term: str) -> str:
         """
@@ -48,6 +50,8 @@ class Video():
         num_subs = self.get_subscriber_count(channel)
 
         if self.song_title not in video.title:
+            print(
+                f'Song title [{self.song_title}] not found in video title [{video.title}].')
             return False
 
         for phrase in YT_PHRASES_BLACKLIST:
@@ -65,9 +69,9 @@ class Video():
             print(video.title)
             print(f'Video {youtube_id} not popular enough for use.')
             return False
-        
+
         if self.is_static(youtube_id):
-            return False        
+            return False
 
         if video.views > YT_VIEW_THRESHOLD:
             return True
@@ -93,7 +97,7 @@ class Video():
             return True
 
         return False
-    
+
     def is_static(self, youtube_id: str):
         """
         Determine if the given YouTube video is a static image.

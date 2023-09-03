@@ -2,6 +2,7 @@
 A Song class containing information for each song in the playlist.
 """
 import time
+import re
 from .lyrics import Lyrics
 from .video import Video
 from .config import *
@@ -14,7 +15,7 @@ class Song():
         Retrieve song information given its Spotify json.
         """
         self.is_valid = True
-        self.title = song_json['name']
+        self.title = re.sub(r'\([^)]*\)', '', song_json['name'])
         self.artists = [artist['name'] for artist in song_json['artists']]
         self.duration_ms = int(song_json['duration_ms'])
 
@@ -69,6 +70,7 @@ class Song():
         attempts = 0
         while attempts < MAX_CONNECTION_ATTEMPTS:
             try:
+                print('Title: ', self.title)
                 song = GENIUS.search_song(self.title + ' ' + self.artists[0])
                 genius_lyrics = song.lyrics
                 break
