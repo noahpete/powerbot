@@ -106,6 +106,10 @@ class Song():
             if chorus_section:
                 break
 
+        if not chorus_section:
+            print('\nERROR: no chorus_section found. Using default times. \n')
+            return DEFAULT_CHORUS_TIME
+
         # default is with chorus start in center
         start_ms = max(0, chorus_section.start_time_ms - 30000)
         end_ms = min(self.duration_ms, chorus_section.start_time_ms + 30000)
@@ -124,6 +128,7 @@ class Song():
                 section_index += 1
                 cur_section = next_section
                 next_section = lyrics.sections[section_index + 1]
-            end_ms = next_section.start_time_ms
+            if next_section:
+                end_ms = next_section.start_time_ms
         print('Chosen times: ', [start_ms, end_ms])
         return [start_ms, end_ms]
