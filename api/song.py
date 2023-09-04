@@ -21,8 +21,13 @@ class Song():
         self.duration_ms = int(song_json['duration_ms'])
 
         # locate chorus
-        lyrics = self.get_lyrics(song_json)
-        self.chorus_time_ms = self.get_chorus_time(lyrics)
+        try:
+            lyrics = self.get_lyrics(song_json)
+            self.chorus_time_ms = self.get_chorus_time(lyrics)
+        except Exception as e:
+            print(f'Unable to fetch lyrics for {self.title}. Error:', e)
+            self.is_valid = False
+            return
 
         # get youtube video
         search_term = self.title + ' ' + self.artists[0] + ' music video'

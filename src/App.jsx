@@ -138,7 +138,7 @@ const App = () => {
                 ""
               )}
             </div>
-            {isLoading && !isPlaying ? (
+            {isLoading ? (
               <LinearProgress
                 color="blue"
                 sx={{
