@@ -50,7 +50,7 @@ class Song():
                                   1000, clip_end_ms + 1000)
 
         while abs(clip_end_ms - clip_start_ms) > MAX_CHORUS_LENGTH_MS:
-            clip_end_ms = max(0, clip_start_ms - 500)
+            clip_end_ms = max(0, clip_end_ms - 500)
             clip_start_ms += 500
 
         clip_start_ms = max(0, clip_start_ms)
@@ -58,7 +58,7 @@ class Song():
 
         if clip_start_ms > clip_end_ms or clip_start_ms < 0 or clip_end_ms / 1000 > yt_video.duration_s:
             print('\nClip start:', clip_start_ms)
-            print('\nClip end:', clip_end_ms)
+            print('Clip end:', clip_end_ms)
             raise Exception(f'Error when clipping video for {self.title}.')
 
         self.clip_time_ms = [clip_start_ms, clip_end_ms]
