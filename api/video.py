@@ -5,7 +5,8 @@ import re
 from pytube import YouTube, Channel
 from youtubesearchpython import VideosSearch
 from .config import *
-from requests import head
+from requests import head, get
+from bs4 import BeautifulSoup
 
 
 class Video():
@@ -48,13 +49,9 @@ class Video():
         Determine whether the provided YouTube video is good for Powerbot.
         """
         video = YouTube(f'https://www.youtube.com/watch?v={youtube_id}')
+        video_title = self.get_video_title(youtube_id)
         channel = Channel(video.channel_url)
         num_subs = self.get_subscriber_count(channel)
-
-        for phrase in YT_PHRASES_WHITELIST:
-            if phrase in video.streams[0].title:
-                print(f'Video {youtube_id} has a desired phrase.')
-                return True
 
         # video length too different from song length
         song_duration_ms = self.song_json['duration_ms']
@@ -63,9 +60,9 @@ class Video():
                 f"Video {youtube_id}'s length ({video.length}) is too different from its corresponding song's length ({song_duration_ms / 1000}).")
             return False
 
-        if self.song_title not in video.title:
+        if self.song_title not in video_title and self.get_alternate_title(self.song_title) not in video_title:
             print(
-                f'Song title [{self.song_title}] not found in video title [{video.title}].')
+                f'Song title [{self.song_title}] not found in video title [{video_title}].')
             return False
 
         for phrase in YT_PHRASES_BLACKLIST:
@@ -74,8 +71,13 @@ class Video():
                     f"Video {youtube_id}'s title contains a blacklisted phrase.")
                 return False
 
+        for phrase in YT_PHRASES_WHITELIST:
+            if phrase in video.streams[0].title:
+                print(f'Video {youtube_id} has a desired phrase.')
+                return True
+
         if num_subs < YT_MIN_SUBSCRIBERS and video.views < YT_VIEW_THRESHOLD:
-            print(video.title)
+            print(video_title)
             print(f'Video {youtube_id} not popular enough for use.')
             return False
 
@@ -92,6 +94,7 @@ class Video():
         Determine if the given YouTube video is usable for Powerbot.
         """
         video = YouTube(f'https://www.youtube.com/watch?v={youtube_id}')
+        video_title = self.get_video_title(youtube_id)
 
         song_duration_ms = self.song_json['duration_ms']
         if abs(song_duration_ms - video.length * 1000) > YT_SONG_DIFF_THRESHOLD_MS:
@@ -102,10 +105,10 @@ class Video():
         if not STATIC_OKAY and self.is_static(youtube_id):
             return False
 
-        if self.song_title not in video.title:
+        if self.song_title not in video_title and self.get_alternate_title(self.song_title) not in video_title:
             return False
 
-        if 'Music Video' or 'Official Audio' in video.title:
+        if 'Music Video' or 'Official Audio' in video_title:
             return True
 
         return False
@@ -128,6 +131,35 @@ class Video():
             return False
         print(f'Video {youtube_id} has been calculated to be static.')
         return True
+
+    def get_video_title(self, youtube_id: str):
+        """
+        Get the actual video title displayed on YouTube.
+        """
+        url = f"https://www.youtube.com/watch?v={youtube_id}"
+        try:
+            response = get(url)
+            if response.status_code == 200:
+                soup = BeautifulSoup(response.text, 'html.parser')
+                meta_tag = soup.find('meta', property='og:title')
+                print('meta_tag:', meta_tag)
+                if meta_tag and 'content' in meta_tag.attrs:
+                    return meta_tag['content']
+                else:
+                    print("Title not found.")
+            else:
+                print('Video title search HTTP request failed.')
+        except Exception as e:
+            print(f'Error getting video title for [{youtube_id}]. Error: {e}')
+            return ''
+
+    def get_alternate_title(self, title: str):
+        """
+        Generate a possible alternate video title.
+        """
+        title = ''.join(title.split()).lower().title()
+        print('Alt title:', title)
+        return title
 
     def get_subscriber_count(self, channel: Channel) -> int:
         """

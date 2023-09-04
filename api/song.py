@@ -35,7 +35,7 @@ class Song():
             yt_video = Video(song_json, search_term)
         except Exception as e:
             print(
-                f'Unable to find usable video while searching for [{search_term}].')
+                f'Unable to find usable video while searching for [{search_term}]. Error: {e}')
             if STATIC_OKAY:
                 search_term = self.title + ' ' + self.artists[0]
                 print(f'Trying video search for [{search_term}].')
