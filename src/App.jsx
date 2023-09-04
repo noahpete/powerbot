@@ -98,6 +98,7 @@ const App = () => {
     setIsPlaying(false);
     setIsGray(false);
     if (timeoutId !== null) {
+      setIsLoading(false);
       clearTimeout(timeoutId);
       setTimeoutId(null);
     }
