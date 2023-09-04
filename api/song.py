@@ -49,6 +49,10 @@ class Song():
                 clip_end_ms = min(yt_video.duration_s *
                                   1000, clip_end_ms + 1000)
 
+        while abs(clip_end_ms - clip_start_ms) > MAX_CHORUS_LENGTH_MS:
+            clip_end_ms = max(0, clip_start_ms - 500)
+            clip_start_ms += 500
+
         clip_start_ms = max(0, clip_start_ms)
         clip_end_ms = min(yt_video.duration_s * 1000, clip_end_ms)
 
