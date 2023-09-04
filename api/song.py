@@ -136,7 +136,7 @@ class Song():
                 print('\nnext_section:', next_section)
                 end_ms = next_section.start_time_ms
 
-        # final check
+        # final safety check
         start_ms = max(0, start_ms + chorus_adjust_ms)
         end_ms = min(self.duration_ms, end_ms + chorus_adjust_ms)
         if end_ms < start_ms:
