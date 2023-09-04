@@ -51,6 +51,11 @@ class Video():
         channel = Channel(video.channel_url)
         num_subs = self.get_subscriber_count(channel)
 
+        for phrase in YT_PHRASES_WHITELIST:
+            if phrase in video.streams[0].title:
+                print(f'Video {youtube_id} has a desired phrase.')
+                return True
+
         # video length too different from song length
         song_duration_ms = self.song_json['duration_ms']
         if abs(song_duration_ms - video.length * 1000) > YT_SONG_DIFF_THRESHOLD_MS:
@@ -68,11 +73,6 @@ class Video():
                 print(
                     f"Video {youtube_id}'s title contains a blacklisted phrase.")
                 return False
-
-        for phrase in YT_PHRASES_WHITELIST:
-            if phrase in video.streams[0].title:
-                print(f'Video {youtube_id} has a desired phrase.')
-                return True
 
         if num_subs < YT_MIN_SUBSCRIBERS and video.views < YT_VIEW_THRESHOLD:
             print(video.title)
