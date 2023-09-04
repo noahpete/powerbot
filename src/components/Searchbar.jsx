@@ -40,7 +40,6 @@ const Searchbar = ({ addFunction, isGray }) => {
       .get(`api/songs/search/${term}/`)
       .then(async (res) => {
         const data = await res.data;
-        console.log("data", data.items);
         setList(data.items);
         return data.items;
       })
