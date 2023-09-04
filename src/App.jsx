@@ -135,7 +135,7 @@ const App = () => {
             <div id="tv" className={constants.COMPONENT_MT}>
               {screenSize < constants.MAX_SINGLE_COL_WIDTH ? (
                 <Tv
-                  youtubeId={curYoutubeId}
+                  youtubeId={isPlaying ? curYoutubeId : ""}
                   startTimeS={Math.floor(curStartMs / 1000)}
                   playing={isPlaying}
                 />
