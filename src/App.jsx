@@ -78,6 +78,8 @@ const App = () => {
           setCurIndex(index);
           setCurYoutubeId(response.data.youtube_id);
           setCurStartMs(response.data.start_time_ms);
+        } else {
+          // TODO: give error flag for song in setlist
         }
         curDelayMs = response.data.duration_ms;
       } catch (error) {
@@ -175,7 +177,7 @@ const App = () => {
               </IconButton>
               <IconButton
                 color="red"
-                disabled={!isPlaying}
+                disabled={!isPlaying && !isLoading}
                 onClick={handleStop}
               >
                 <StopIcon />
@@ -192,7 +194,7 @@ const App = () => {
             </Controls>
             <div
               className={
-                isPlaying
+                isPlaying || isLoading
                   ? "pointer-events-none opacity-40 mt-2 transition ease-in-out duration-1000"
                   : "mt-2 transition ease-in-out duration-1000 "
               }
@@ -221,7 +223,9 @@ const App = () => {
             <div
               id="setlist"
               className={
-                isPlaying ? "pointer-events-none opacity-40 mt-2" : "mt-2"
+                isPlaying || isLoading
+                  ? "pointer-events-none opacity-40 mt-2"
+                  : "mt-2"
               }
             >
               <DragDropContext
