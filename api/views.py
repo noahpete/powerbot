@@ -57,14 +57,14 @@ class SongView(viewsets.ModelViewSet):
                 return django.http.HttpResponse(404)
             print(f'Used {song.youtube_id} for {song.title} by {song.artists}.')
             return django.http.JsonResponse({
+                'status': 'success',
                 'youtube_id': song.youtube_id,
                 'start_time_ms': song.clip_time_ms[0],
                 'duration_ms': song.clip_time_ms[1] - song.clip_time_ms[0]
             })
         except Exception as e:
-            print('\nExc:', e)
-            return django.http.HttpResponse(
-                {'message': f'Error when searching for lyrics for song with id {song_id}.',
-                    'error': str(e)},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            print('\nExc:', e, '\n')
+            return django.http.JsonResponse({
+                'status': 'fail',
+                'duration_ms': 1000,
+            })

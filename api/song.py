@@ -31,7 +31,26 @@ class Song():
 
         # get youtube video
         search_term = self.title + ' ' + self.artists[0] + ' music video'
-        yt_video = Video(song_json, search_term)
+        try:
+            yt_video = Video(song_json, search_term)
+        except Exception as e:
+            print(
+                f'Unable to find usable video while searching for [{search_term}].')
+            if STATIC_OKAY:
+                search_term = self.title + ' ' + self.artists[0]
+                print(f'Trying video search for [{search_term}].')
+                try:
+                    yt_video = Video(song_json, search_term)
+                except Exception as e:
+                    print(
+                        f'Unable to find any video for {search_term}.')
+                    self.is_valid = False
+                    return
+                print(f'Successful video search for [{search_term}].')
+            else:
+                self.is_valid = False
+                return
+
         self.youtube_id = yt_video.youtube_id
 
         # get desired section of video
@@ -62,6 +81,7 @@ class Song():
             raise Exception(f'Error when clipping video for {self.title}.')
 
         self.clip_time_ms = [clip_start_ms, clip_end_ms]
+        print('Using clip times:', self.clip_time_ms)
 
     def get_lyrics(self, song_json: dict) -> Lyrics:
         """

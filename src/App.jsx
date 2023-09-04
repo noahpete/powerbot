@@ -70,13 +70,15 @@ const App = () => {
 
       try {
         setIsLoading(true);
-        setIsGray(true);
         const response = await axios.get(`/api/songs/${song.id}/`);
-        setIsLoading(false);
-        setIsPlaying(true);
-        setCurIndex(index);
-        setCurYoutubeId(response.data.youtube_id);
-        setCurStartMs(response.data.start_time_ms);
+        if (response.data.status == "success") {
+          setIsGray(true);
+          setIsLoading(false);
+          setIsPlaying(true);
+          setCurIndex(index);
+          setCurYoutubeId(response.data.youtube_id);
+          setCurStartMs(response.data.start_time_ms);
+        }
         curDelayMs = response.data.duration_ms;
       } catch (error) {
         console.error("Error fetching song data:", error);

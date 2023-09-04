@@ -17,6 +17,7 @@ class Video():
         temp_title = re.sub(r' \([^)]*\)', '', song_json['name'])
         self.song_title = re.sub(r'\bfeat\b.*', '', temp_title)
         self.song_json = song_json
+        self.search_term = search_term
         self.youtube_id = self.select_video(search_term)
         self.duration_s = YouTube(
             f'https://www.youtube.com/watch?v={self.youtube_id}').length
@@ -31,14 +32,14 @@ class Video():
             if self.is_good(result['id']):
                 return result['id']
             print(
-                f'Skipped video with id {result["id"]} while searching for {self.song_title}.')
+                f'Skipped video with id {result["id"]} while searching for [{self.search_term}].')
 
         print('No good YouTube videos found.')
         for result in results:
             if self.is_usable(result['id']):
                 return result['id']
             print(
-                f'Video with id {result["id"]} while searching for {self.song_title} is not usable.'
+                f'Video with id {result["id"]} while searching for [{self.search_term}] is not usable.'
             )
         raise Exception('No usable YouTube videos found.')
 
@@ -49,6 +50,13 @@ class Video():
         video = YouTube(f'https://www.youtube.com/watch?v={youtube_id}')
         channel = Channel(video.channel_url)
         num_subs = self.get_subscriber_count(channel)
+
+        # video length too different from song length
+        song_duration_ms = self.song_json['duration_ms']
+        if abs(song_duration_ms - video.length * 1000) > YT_SONG_DIFF_THRESHOLD_MS:
+            print(
+                f"Video {youtube_id}'s length ({video.length}) is too different from its corresponding song's length ({song_duration_ms / 1000}).")
+            return False
 
         if self.song_title not in video.title:
             print(
@@ -71,17 +79,11 @@ class Video():
             print(f'Video {youtube_id} not popular enough for use.')
             return False
 
-        if self.is_static(youtube_id):
+        if not STATIC_OKAY and self.is_static(youtube_id):
             return False
 
         if video.views > YT_VIEW_THRESHOLD:
             return True
-
-        # video length too different from song length
-        if abs(self.song_json['duration_ms'] / 1000 - video.length) > YT_SONG_DIFF_THRESHOLD_MS:
-            print(
-                f"Video {youtube_id}'s length ({video.length}) is too different from its corresponding song's length ({self.duration_ms / 1000}).")
-            return False
 
         return True
 
@@ -90,6 +92,15 @@ class Video():
         Determine if the given YouTube video is usable for Powerbot.
         """
         video = YouTube(f'https://www.youtube.com/watch?v={youtube_id}')
+
+        song_duration_ms = self.song_json['duration_ms']
+        if abs(song_duration_ms - video.length * 1000) > YT_SONG_DIFF_THRESHOLD_MS:
+            print(
+                f"Video {youtube_id}'s length ({video.length}) is too different from its corresponding song's length ({song_duration_ms / 1000}).")
+            return False
+
+        if not STATIC_OKAY and self.is_static(youtube_id):
+            return False
 
         if self.song_title not in video.title:
             return False
