@@ -32,7 +32,7 @@ export const MAX_SINGLE_COL_WIDTH = 640;
 export const COMPONENT_MT = "mt-2";
 
 // App.jsx
-export const ADVANCE_SONG_FETCH_MS = -6000;
+export const ADVANCE_SONG_FETCH_MS = -10000;
 export const MAX_SETLIST_LENGTH = 60;
 
 // Searchbar.jsx
