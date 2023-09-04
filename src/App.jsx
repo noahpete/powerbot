@@ -71,7 +71,7 @@ const App = () => {
       try {
         setIsLoading(true);
         const response = await axios.get(`/api/songs/${song.id}/`);
-        if (response.data.status == "success") {
+        if (response.data.status == "success" && isLoading) {
           setIsGray(true);
           setIsLoading(false);
           setIsPlaying(true);
