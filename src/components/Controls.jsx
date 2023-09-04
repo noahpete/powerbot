@@ -4,19 +4,7 @@ import * as constants from "../constants.js";
 
 const Controls = ({ children, isLoading = false }) => {
   return (
-    <div id="controls">
-      <div id="loading-bar" className="h-[8px]">
-        {isLoading ? (
-          <LinearProgress
-            sx={{
-              height: 8,
-            }}
-          ></LinearProgress>
-        ) : (
-          ""
-        )}
-      </div>
-
+    <div id="controls" className="bg-white">
       <div id="buttons-count" className="flex">
         {children}
       </div>

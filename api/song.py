@@ -15,7 +15,8 @@ class Song():
         Retrieve song information given its Spotify json.
         """
         self.is_valid = True
-        self.title = re.sub(r' \([^)]*\)', '', song_json['name'])
+        temp_title = re.sub(r' \([^)]*\)', '', song_json['name'])
+        self.title = re.sub(r'\bfeat\b.*', '', temp_title)
         self.artists = [artist['name'] for artist in song_json['artists']]
         self.duration_ms = int(song_json['duration_ms'])
 
@@ -91,6 +92,7 @@ class Song():
         """
         Get the chorus start and end times in ms.
         """
+        chorus_adjust_ms = 0
         chorus_section, section_index = None, 0
         for label in SECTIONS_BY_PREFERENCE:
             for i, section in enumerate(lyrics.sections):
@@ -99,6 +101,8 @@ class Song():
                     self.chorus_present = False
                     break
                 if section.label == label and section.start_time_ms > CHORUS_MIN_START_TIME_MS:
+                    if label in ['hook', 'verse']:
+                        chorus_adjust_ms += HOOK_VERSE_OFFSET_MS
                     chorus_section = section
                     section_index = i
                     print('\nChosen section: ', section)
@@ -129,6 +133,14 @@ class Song():
                 cur_section = next_section
                 next_section = lyrics.sections[section_index + 1]
             if next_section:
+                print('\nnext_section:', next_section)
                 end_ms = next_section.start_time_ms
+
+        # final check
+        start_ms = max(0, start_ms + chorus_adjust_ms)
+        end_ms = min(self.duration_ms, end_ms + chorus_adjust_ms)
+        if end_ms < start_ms:
+            end_ms = min(self.duration_ms, start_ms + MIN_CHORUS_LENGTH_MS)
         print('Chosen times: ', [start_ms, end_ms])
+
         return [start_ms, end_ms]

@@ -3,7 +3,7 @@ import axios from "axios";
 import SearchIcon from "@mui/icons-material/Search";
 import SongCard from "./SongCard";
 
-const Searchbar = ({ addFunction }) => {
+const Searchbar = ({ addFunction, isGray }) => {
   const INPUT_REFRESH_MS = 500;
 
   const [list, setList] = useState([]);
@@ -103,6 +103,7 @@ const Searchbar = ({ addFunction }) => {
             small={true}
             addFunction={addFunction}
             key={i}
+            isGray={isGray}
           />
         ))}
       </div>

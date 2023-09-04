@@ -14,7 +14,8 @@ class Video():
         """
         Retrieve YouTube video information given a search term.
         """
-        self.song_title = re.sub(r' \([^)]*\)', '', song_json['name'])
+        temp_title = re.sub(r' \([^)]*\)', '', song_json['name'])
+        self.song_title = re.sub(r'\bfeat\b.*', '', temp_title)
         self.song_json = song_json
         self.youtube_id = self.select_video(search_term)
         self.duration_s = YouTube(
@@ -99,7 +100,7 @@ class Video():
         return False
 
     def is_static(self, youtube_id: str):
-        """
+        """ 
         Determine if the given YouTube video is a static image.
         """
         sizes = []

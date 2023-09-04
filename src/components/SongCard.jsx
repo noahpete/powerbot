@@ -11,6 +11,7 @@ const SongCard = ({
   small = false,
   addFunction,
   removeFunction,
+  isGray = false,
 }) => {
   const handleAddSong = () => {
     addFunction(song);
@@ -29,7 +30,9 @@ const SongCard = ({
         <img
           alt="song album cover"
           src={song?.album.images[1]?.url}
-          className="h-full w-full"
+          className={`h-full w-full transition ease-in-out duration-1000 ${
+            isGray ? "grayscale" : ""
+          } `}
         />
       </div>
       <div

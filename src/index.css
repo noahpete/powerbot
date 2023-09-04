@@ -22,3 +22,23 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+@font-face {
+  font-family: "MTV Lowercase 2";
+  src: url("https://db.onlinewebfonts.com/t/9f19712e57bf1c8bc5cbfaa0bc0a2826.eot");
+  src: url("https://db.onlinewebfonts.com/t/9f19712e57bf1c8bc5cbfaa0bc0a2826.eot?#iefix")
+      format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/9f19712e57bf1c8bc5cbfaa0bc0a2826.woff2")
+      format("woff2"),
+    url("https://db.onlinewebfonts.com/t/9f19712e57bf1c8bc5cbfaa0bc0a2826.woff")
+      format("woff"),
+    url("https://db.onlinewebfonts.com/t/9f19712e57bf1c8bc5cbfaa0bc0a2826.ttf")
+      format("truetype"),
+    url("https://db.onlinewebfonts.com/t/9f19712e57bf1c8bc5cbfaa0bc0a2826.svg#MTV Lowercase 2")
+      format("svg");
+}
+
+#stat {
+  font-family: "MTV Lowercase 2";
+  font-size: large;
+}

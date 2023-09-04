@@ -21,6 +21,7 @@ const App = () => {
   const [timeoutId, setTimeoutId] = useState(null);
   const [curIndex, setCurIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
+  const [isGray, setIsGray] = useState(false);
 
   const addToSetlist = (song) => {
     setCurIndex(0);
@@ -53,7 +54,6 @@ const App = () => {
     if (setlist.length < 1) return;
 
     setCurYoutubeId("");
-    setIsPlaying(true);
 
     let curDelayMs = 0;
     for (const [index, song] of setlist.entries()) {
@@ -70,8 +70,10 @@ const App = () => {
 
       try {
         setIsLoading(true);
+        setIsGray(true);
         const response = await axios.get(`/api/songs/${song.id}/`);
         setIsLoading(false);
+        setIsPlaying(true);
         setCurIndex(index);
         setCurYoutubeId(response.data.youtube_id);
         setCurStartMs(response.data.start_time_ms);
@@ -90,6 +92,7 @@ const App = () => {
 
   const handleStop = () => {
     setIsPlaying(false);
+    setIsGray(false);
     if (timeoutId !== null) {
       clearTimeout(timeoutId);
       setTimeoutId(null);
@@ -109,7 +112,10 @@ const App = () => {
 
   return (
     <ThemeProvider theme={constants.THEME}>
-      <div id="App" className="w-full h-full p-4">
+      <div
+        id="App"
+        className={`w-full h-full p-4 ${isPlaying ? "bg-white" : "bg-white"}`}
+      >
         <div
           id="main-container"
           className="sm:flex max-w-[854px] w-full m-auto"
@@ -132,7 +138,7 @@ const App = () => {
                 ""
               )}
             </div>
-            {isLoading ? (
+            {isLoading && !isPlaying ? (
               <LinearProgress
                 color="blue"
                 sx={{
@@ -143,7 +149,7 @@ const App = () => {
               <div className="h-[8px]" />
             )}
 
-            <Controls isLoading={isLoading}>
+            <Controls>
               <IconButton
                 color="secondary"
                 disabled={setlist.length < 2 || isPlaying}
@@ -153,14 +159,14 @@ const App = () => {
               </IconButton>
               <IconButton
                 color="yellow"
-                disabled={setlist.length < 1 || isPlaying}
+                disabled={setlist.length < 1 || isPlaying || isLoading}
                 onClick={handleRestart}
               >
                 <RepeatIcon />
               </IconButton>
               <IconButton
                 color="blue"
-                disabled={setlist.length < 1 || isPlaying}
+                disabled={setlist.length < 1 || isPlaying || isLoading}
                 onClick={() => handlePlay(curIndex)}
               >
                 <PlayIcon />
@@ -172,19 +178,24 @@ const App = () => {
               >
                 <StopIcon />
               </IconButton>
-              <p className={`${constants.COMPONENT_MT} ml-2`}>
-                # tracks: {setlist.length} / {constants.MAX_SETLIST_LENGTH}
-              </p>
-              <p className={`${constants.COMPONENT_MT}`}>
-                , current track: {isPlaying ? curIndex + 1 : "-"}
-              </p>
+              {isPlaying || isLoading ? (
+                <p id="stat" className={`${constants.COMPONENT_MT} m-auto`}>
+                  track {curIndex + 1} / {setlist.length}
+                </p>
+              ) : (
+                <p id="stat" className={`${constants.COMPONENT_MT} m-auto`}>
+                  # tracks: {setlist.length} / {constants.MAX_SETLIST_LENGTH}
+                </p>
+              )}
             </Controls>
             <div
               className={
-                isPlaying ? "pointer-events-none opacity-40 mt-2" : "mt-2"
+                isPlaying
+                  ? "pointer-events-none opacity-40 mt-2 transition ease-in-out duration-1000"
+                  : "mt-2 transition ease-in-out duration-1000 "
               }
             >
-              <Searchbar addFunction={addToSetlist} />
+              <Searchbar addFunction={addToSetlist} isGray={isGray} />
             </div>
           </div>
 
@@ -253,6 +264,7 @@ const App = () => {
                                 song={song}
                                 removeFunction={removeFromSetlist}
                                 index={i}
+                                isGray={isGray}
                               />
                             </li>
                           )}

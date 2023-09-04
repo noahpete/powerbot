@@ -20,12 +20,15 @@ MAX_SEARCH_HITS = 10
 SECTIONS_BY_PREFERENCE = [
     'segue',
     'pre-chorus',
+    'hook',
     'chorus',
+    'verse',
 ]
 CHORUS_MIN_START_TIME_MS = 10000
 CHORUS_BUFFER_MS = 12000
 MIN_CHORUS_LENGTH_MS = 50000
 DEFAULT_CHORUS_TIME = [12000, 77000]
+HOOK_VERSE_OFFSET_MS = -16000
 
 # video.py
 YT_PHRASES_WHITELIST = ['(Official Video)', '(Official Music Video)']
