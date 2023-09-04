@@ -53,6 +53,7 @@ class SongView(viewsets.ModelViewSet):
             song_json = SPOTIFY.tracks([song_id])['tracks'][0]
             song = Song(song_json)
             if not song.is_valid:
+                print(f'Skipping song {song_json["name"]}')
                 return django.http.HttpResponse(404)
             print(f'Used {song.youtube_id} for {song.title} by {song.artists}.')
             return django.http.JsonResponse({
