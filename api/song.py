@@ -59,6 +59,7 @@ class Song():
         Use this track's Spotify and Genius lyrics to parse the song.
         """
         attempts = 0
+        spotify_lyrics, genius_lyrics = None, None
         while attempts < MAX_CONNECTION_ATTEMPTS:
             try:
                 spotify_lyrics = SPOTIFY.get_lyrics(song_json['id'])['lyrics']
