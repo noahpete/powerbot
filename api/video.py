@@ -60,7 +60,7 @@ class Video():
                 f"Video {youtube_id}'s length ({video.length}) is too different from its corresponding song's length ({song_duration_ms / 1000}).")
             return False
 
-        if self.song_title not in video_title and self.get_alternate_title(self.song_title) not in video_title:
+        if self.song_title.lower() not in video_title.lower() and self.get_alternate_title(self.song_title).lower() not in video_title.lower():
             print(
                 f'Song title [{self.song_title}] not found in video title [{video_title}].')
             return False
