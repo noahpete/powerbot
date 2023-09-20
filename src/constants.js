@@ -22,7 +22,7 @@ export const THEME = createTheme({
     },
   },
   typography: {
-    fontFamily: ['"Segoe UI"', "Helvetica", "Arial", "Roboto"].join(","),
+    fontFamily: ["Segoe UI", "Helvetica", "Arial", "Roboto"].join(","),
   },
 });
 
