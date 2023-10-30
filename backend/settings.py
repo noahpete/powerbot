@@ -32,14 +32,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'build/static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 
-# django react tools
-REACT_PROJECT_DIRECTORY = '.'
-REACT_DJANGO_DEST = STATIC_ROOT
-REACT_MANIFEST_FILE = 'manifest.json'
-REACT_DEV_SERVER = 'http://localhost:3000/'
-REACT_DEV_MODE = True
-
-
 # Application definition
 
 INSTALLED_APPS = [
