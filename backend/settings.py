@@ -21,7 +21,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-$os=5yt==dh%4t8j&=g_=@h(zx3@0j_+938p3us49(h#lrgy$y'
 DEBUG = False
-ALLOWED_HOSTS = ['0.0.0.0', 'localhost']
+ALLOWED_HOSTS = ['*']
 SECURE_REFERRER_POLICY = "no-referrer-when-downgrade"
 
 

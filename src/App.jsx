@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import axios from "axios";
 import { IconButton, LinearProgress } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
@@ -6,6 +6,7 @@ import ShuffleIcon from "@mui/icons-material/Shuffle";
 import RepeatIcon from "@mui/icons-material/RestartAlt";
 import PlayIcon from "@mui/icons-material/PlayArrow";
 import StopIcon from "@mui/icons-material/Stop";
+import FullscreenIcon from "@mui/icons-material/Fullscreen";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Controls, Searchbar, SongCard } from "./components";
 import * as constants from "./constants";
@@ -22,6 +23,7 @@ const App = () => {
   const [curIndex, setCurIndex] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
   const [isGray, setIsGray] = useState(false);
+  const screenRef = useRef();
 
   const addToSetlist = (song) => {
     setCurIndex(0);
@@ -108,6 +110,10 @@ const App = () => {
     setScreenSize(window.innerWidth);
   };
 
+  const handleFullScreen = () => {
+    screenRef.handleClick();
+  };
+
   useEffect(() => {
     window.addEventListener("resize", handleResize);
     return () => {
@@ -138,6 +144,7 @@ const App = () => {
                   youtubeId={curYoutubeId}
                   startTimeS={Math.floor(curStartMs / 1000)}
                   playing={isPlaying}
+                  ref={screenRef}
                 />
               ) : (
                 ""
@@ -183,6 +190,13 @@ const App = () => {
               >
                 <StopIcon />
               </IconButton>
+              <IconButton
+                color="secondary"
+                disabled={!isPlaying && !isLoading}
+                onClick={handleFullScreen}
+              >
+                <FullscreenIcon />
+              </IconButton>
               {isPlaying || isLoading ? (
                 <p id="stat" className={`${constants.COMPONENT_MT} m-auto`}>
                   track {curIndex + 1} / {setlist.length}
@@ -219,6 +233,7 @@ const App = () => {
                 youtubeId={curYoutubeId}
                 startTimeS={Math.floor(curStartMs / 1000)}
                 playing={isPlaying}
+                ref={screenRef}
               />
             )}
             <div
